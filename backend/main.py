@@ -1,5 +1,9 @@
 """Brain OS POC — FastAPI entry point"""
 from __future__ import annotations
+import sys
+import os
+# Vercel runs from project root (/var/task/), not backend/ — ensure this dir is importable
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
