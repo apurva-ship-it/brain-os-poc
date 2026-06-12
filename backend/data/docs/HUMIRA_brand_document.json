@@ -1,0 +1,229 @@
+{
+  "brand_document_id": "HUMIRA-001",
+  "data_source": "FDA-approved Prescribing Information — AbbVie Inc. (DailyMed / FDA label, current as of 2025)",
+  "source_note": "HUMIRA (adalimumab) is the anti-TNF biologic with the widest approved indication set in immunology. Patent expired; biosimilars now in market (Hadlima, Cyltezo, Hyrimoz, Hadlima, Yusimry, etc.). Full label at DailyMed.",
+
+  "brand_metadata": {
+    "brand_name": "HUMIRA",
+    "generic_name": "adalimumab",
+    "manufacturer": "AbbVie Inc.",
+    "drug_class": "TNF blocker / Anti-TNF-alpha monoclonal antibody",
+    "therapeutic_area": "Immunology — Rheumatology, Gastroenterology, Dermatology",
+    "route_of_administration": ["subcutaneous injection"],
+    "dosage_forms": ["40 mg/0.8 mL prefilled syringe", "40 mg/0.8 mL prefilled pen (HUMIRA Pen)", "Citrate-free formulations (less injection-site pain)"],
+    "approval_status": "FDA-approved (Reference biologic; biosimilars available)",
+    "first_approval": "2002 (rheumatoid arthritis)",
+    "biosimilar_competition": "Yes — multiple FDA-approved adalimumab biosimilars entered market 2023"
+  },
+
+  "indications": {
+    "approved_indications": [
+      {
+        "indication_id": "IND-001",
+        "disease": "Rheumatoid Arthritis (RA)",
+        "indication_text": "Reducing signs and symptoms, inducing major clinical response, inhibiting the progression of structural damage, and improving physical function in adult patients with moderately to severely active RA. Can be used alone or with methotrexate or other non-biologic DMARDs.",
+        "population": "Adults"
+      },
+      {
+        "indication_id": "IND-002",
+        "disease": "Juvenile Idiopathic Arthritis (JIA)",
+        "indication_text": "Moderately to severely active polyarticular JIA in patients 2 years of age and older.",
+        "population": "Pediatric patients ≥2 years"
+      },
+      {
+        "indication_id": "IND-003",
+        "disease": "Psoriatic Arthritis (PsA)",
+        "indication_text": "Reducing signs and symptoms of active psoriatic arthritis, inhibiting structural damage progression, and improving physical function. Can be used alone or with DMARDs.",
+        "population": "Adults"
+      },
+      {
+        "indication_id": "IND-004",
+        "disease": "Ankylosing Spondylitis (AS)",
+        "indication_text": "Reducing signs and symptoms in adults with active ankylosing spondylitis.",
+        "population": "Adults"
+      },
+      {
+        "indication_id": "IND-005",
+        "disease": "Crohn's Disease (CD)",
+        "indication_text": "Reducing signs and symptoms and inducing and maintaining clinical remission in adult patients with moderately to severely active Crohn's disease who have inadequate response to conventional therapy; also for reducing signs and symptoms and inducing clinical remission in pediatric patients 6 years and older with moderately to severely active CD who have had inadequate response to corticosteroids or immunomodulators.",
+        "population": "Adults and pediatric patients ≥6 years"
+      },
+      {
+        "indication_id": "IND-006",
+        "disease": "Ulcerative Colitis (UC)",
+        "indication_text": "Inducing and sustaining clinical remission in adults with moderately to severely active UC who have had inadequate response to immunosuppressants. HUMIRA is not recommended for patients who have lost response to or are intolerant to TNF blockers.",
+        "population": "Adults",
+        "restriction": "Not recommended after TNF blocker failure"
+      },
+      {
+        "indication_id": "IND-007",
+        "disease": "Plaque Psoriasis",
+        "indication_text": "Treatment of adult patients with moderate to severe chronic plaque psoriasis who are candidates for systemic therapy or phototherapy, and when other systemic therapies are medically less appropriate.",
+        "population": "Adults and pediatric patients ≥4 years"
+      },
+      {
+        "indication_id": "IND-008",
+        "disease": "Hidradenitis Suppurativa (HS)",
+        "indication_text": "Treatment of moderate to severe hidradenitis suppurativa in patients 12 years and older.",
+        "population": "Patients ≥12 years"
+      },
+      {
+        "indication_id": "IND-009",
+        "disease": "Uveitis",
+        "indication_text": "Treatment of non-infectious intermediate, posterior, and panuveitis in adults and pediatric patients 2 years and older.",
+        "population": "Adults and pediatric patients ≥2 years"
+      }
+    ]
+  },
+
+  "mechanism_of_action": {
+    "moa_summary": "Adalimumab is a recombinant human IgG1 monoclonal antibody that specifically binds to TNF-alpha and blocks its interaction with the p55 and p75 cell surface TNF receptors.",
+    "key_mechanisms": [
+      "Binds specifically to TNF-alpha (not TNF-beta/lymphotoxin)",
+      "Blocks TNF-alpha from binding p55 and p75 receptors on cell surfaces",
+      "Lyses surface TNF-expressing cells in vitro in presence of complement",
+      "Does not bind or inactivate lymphotoxin (TNF-beta) — selectively targets TNF-alpha"
+    ],
+    "downstream_effects": [
+      "Reduces levels of acute phase reactants (CRP, ESR)",
+      "Reduces serum cytokines (IL-6)",
+      "Reduces matrix metalloproteinases (MMP-1, MMP-3) involved in tissue remodeling and joint damage"
+    ]
+  },
+
+  "approved_claims": [
+    {
+      "claim_id": "CLM-001",
+      "claim_text": "HUMIRA significantly reduced signs and symptoms of RA and inhibited radiographic progression of structural damage at 1 year compared to methotrexate alone (PREMIER trial).",
+      "claim_type": "Efficacy — RA Disease Activity + Structural",
+      "supporting_data": "PREMIER: ACR20 response 62% (adalimumab + MTX) vs 46% (MTX alone) at week 52. Combination arm showed significantly less radiographic progression (TSS change 1.3 vs 5.7 for MTX alone).",
+      "source": "PREMIER trial"
+    },
+    {
+      "claim_id": "CLM-002",
+      "claim_text": "HUMIRA reduced signs and symptoms of RA as monotherapy, with significantly more patients achieving ACR20, ACR50, and ACR70 responses versus placebo (ARMADA trial).",
+      "claim_type": "Efficacy — RA monotherapy vs. placebo",
+      "supporting_data": "ARMADA: ACR20 67.2% vs 14.9% (placebo) at 24 weeks, p<0.001. ACR50 55.2% vs 7.5%. ACR70 26.9% vs 4.5%.",
+      "source": "ARMADA trial"
+    },
+    {
+      "claim_id": "CLM-003",
+      "claim_text": "HUMIRA induced clinical remission in moderately to severely active Crohn's disease patients who failed conventional therapy (CLASSIC-I and CHARM trials).",
+      "claim_type": "Efficacy — Crohn's Disease Remission",
+      "supporting_data": "CLASSIC-I (induction): Remission rates 36% (160/80mg) vs 12% placebo. CHARM (maintenance): 40% remission at week 56 vs 17% placebo.",
+      "source": "CLASSIC-I, CHARM trials"
+    },
+    {
+      "claim_id": "CLM-004",
+      "claim_text": "HUMIRA achieved PASI 75 response in 71% of patients with moderate-to-severe chronic plaque psoriasis vs. 7% on placebo at 16 weeks (REVEAL trial).",
+      "claim_type": "Efficacy — Plaque Psoriasis PASI Response",
+      "supporting_data": "REVEAL: 71.2% PASI 75 vs 7.3% placebo at week 16. PASI 90 response 45% vs 2.1%.",
+      "source": "REVEAL trial"
+    },
+    {
+      "claim_id": "CLM-005",
+      "claim_text": "HUMIRA reduced Hidradenitis Suppurativa lesion count with significantly more patients achieving HiSCR (≥50% reduction in abscess/inflammatory nodule count) vs. placebo at week 12 (PIONEER I & II).",
+      "claim_type": "Efficacy — Hidradenitis Suppurativa",
+      "supporting_data": "PIONEER I: HiSCR 41.8% vs 26.0% placebo. PIONEER II: HiSCR 58.9% vs 27.6% placebo.",
+      "source": "PIONEER I, PIONEER II trials"
+    },
+    {
+      "claim_id": "CLM-006",
+      "claim_text": "HUMIRA is the first and only TNF blocker approved for the treatment of non-infectious uveitis across a broad age range including pediatric patients as young as 2 years of age.",
+      "claim_type": "Differentiation — Uveitis Indication",
+      "supporting_data": "FDA approval based on VISUAL I and VISUAL II trials plus pediatric extension",
+      "note": "Verify 'first and only' claim currency against current competitive landscape before use"
+    }
+  ],
+
+  "boxed_warning": {
+    "warning_title": "SERIOUS INFECTIONS AND MALIGNANCY",
+    "warning_summary_infections": "Patients treated with HUMIRA are at increased risk for developing serious infections that may lead to hospitalization or death. Most patients who developed these infections were taking concomitant immunosuppressants. Reported infections include active tuberculosis (TB), invasive fungal infections (histoplasmosis, aspergillosis, coccidioidomycosis, blastomycosis, candidiasis), and infections due to bacterial, viral, and other opportunistic pathogens. Discontinue if serious infection develops.",
+    "warning_summary_malignancy": "Lymphoma and other malignancies, some fatal, have been reported in children and adolescent patients treated with TNF blockers. Post-marketing cases of hepatosplenic T-cell lymphoma (HSTCL) — a rare, aggressive fatal lymphoma — reported in patients treated with TNF blockers including adalimumab. Cases primarily occurred in adolescent and young adult males with Crohn's disease or UC on concurrent azathioprine or 6-mercaptopurine.",
+    "source_section": "Boxed Warning"
+  },
+
+  "key_warnings": [
+    "Serious infections (TB, fungal, bacterial, viral) — screen for latent TB before starting; treat latent TB before initiating HUMIRA",
+    "Invasive fungal infections — consider empiric antifungal therapy in endemic areas",
+    "Malignancies — lymphoma, HSTCL in pediatric/adolescent IBD patients on concomitant immunosuppressants",
+    "Hepatitis B virus reactivation — screen all patients for HBV infection before starting",
+    "Heart failure (worsening) — avoid use with moderate-severe CHF (NYHA Class III/IV)",
+    "Demyelinating disease — rare CNS demyelinating events reported; discontinue if new onset",
+    "Lupus-like syndrome — discontinue if suspected",
+    "Cytopenias (pancytopenia including aplastic anemia) — rare",
+    "Anaphylaxis / hypersensitivity reactions"
+  ],
+
+  "contraindications": [
+    {
+      "contraindication_id": "CI-001",
+      "text": "No absolute contraindications listed formally, but HUMIRA should NOT be initiated in patients with active serious infections, including localized infections.",
+      "source_section": "Warnings and Precautions 5.1"
+    },
+    {
+      "contraindication_id": "CI-002",
+      "text": "Not recommended for use with other biologic DMARDs (abatacept, rituximab, anakinra) due to increased risk of serious infections.",
+      "source_section": "5.1"
+    }
+  ],
+
+  "adverse_reactions": {
+    "most_common_gte_10pct": ["upper respiratory tract infection", "injection site reactions (erythema, itching, hemorrhage, pain, swelling)", "headache", "rash", "sinusitis", "nausea", "urinary tract infection"],
+    "serious_adverse_reactions": [
+      "Serious infections (see boxed warning)",
+      "Malignancies (see boxed warning)",
+      "Demyelinating diseases",
+      "Congestive heart failure worsening",
+      "Hepatotoxicity (rare cases of hepatic failure)",
+      "Cytopenias"
+    ],
+    "injection_site_reactions": "Occurred in approximately 20% of patients. Generally mild and did not require discontinuation. Citrate-free formulation associated with reduced injection site pain.",
+    "immunogenicity": "Approximately 5% of patients developed anti-adalimumab antibodies (with concomitant MTX). Antibody formation associated with reduced efficacy."
+  },
+
+  "dosing": {
+    "rheumatoid_arthritis": "40 mg subcutaneous every other week (eow). Some patients not on MTX may benefit from 40 mg weekly.",
+    "crohns_disease_adults": "Induction: 160 mg SC day 1, 80 mg day 15. Maintenance: 40 mg eow starting day 29.",
+    "plaque_psoriasis_adults": "Induction: 80 mg SC, then 40 mg eow starting one week after initial dose.",
+    "hidradenitis_suppurativa_adults": "Induction: 160 mg SC day 1 (or 80 mg on days 1 and 2), then 80 mg on day 15. Maintenance: 40 mg weekly starting day 29.",
+    "uveitis_adults": "80 mg SC, then 40 mg eow starting one week after initial dose.",
+    "pediatric_dosing": "Weight-based dosing for JIA (10–<15 kg, 15–<30 kg, ≥30 kg) and pediatric CD and uveitis.",
+    "source_section": "2 Dosage and Administration"
+  },
+
+  "pre_treatment_screening": [
+    "Test for latent TB (tuberculin skin test or IGRA); treat latent TB before initiating HUMIRA",
+    "Screen for HBV infection (HBsAg, anti-HBc)",
+    "Evaluate for signs of active infection",
+    "Update all vaccinations prior to initiating therapy (per current immunization guidelines) — avoid live vaccines during treatment"
+  ],
+
+  "competitive_context": {
+    "drug_class": "Anti-TNF biologics",
+    "competitors_same_class": ["Enbrel (etanercept)", "Remicade (infliximab — IV)", "Simponi (golimumab)", "Cimzia (certolizumab pegol)"],
+    "biosimilars_approved": ["Hadlima", "Cyltezo", "Hyrimoz", "Yusimry", "Simlandi", "Hulio", "Abrilada", "Amjevita", "Hyrimoz (citrate-free)"],
+    "differentiation_from_biosimilars": "HUMIRA is the reference biologic; biosimilars are FDA-approved as highly similar with no clinically meaningful differences. Biosimilar competition significant since 2023 US market entry.",
+    "position_vs_newer_mechanisms": "JAK inhibitors (Xeljanz, Rinvoq, Olumiant) and newer biologics (IL-17, IL-23 blockers for psoriasis/SpA; anti-integrin for IBD) compete in overlapping indications. HUMIRA remains standard-of-care across multiple indications despite competition."
+  },
+
+  "marketing_content_rules": {
+    "mandatory_references": [
+      "All efficacy claims must cite specific clinical trial name and primary endpoint data",
+      "RA claims must distinguish monotherapy vs. combination with MTX",
+      "Biosimilar differentiation messaging requires careful legal/regulatory review — efficacy/safety claims vs. reference biologic require high evidentiary bar"
+    ],
+    "prohibited_claims": [
+      "Do NOT minimize the boxed warning for serious infections and malignancies",
+      "Do NOT promote off-label use in tumor types or indications not listed in approved label",
+      "Do NOT make superiority claims vs. class without head-to-head clinical data",
+      "Do NOT use 'safe' as a standalone claim — all biologics carry significant risk"
+    ],
+    "required_fair_balance": [
+      "Boxed warning — serious infections and malignancies (especially HSTCL in pediatric/young adult IBD patients)",
+      "TB reactivation risk and screening requirement",
+      "HBV reactivation risk",
+      "Injection site reactions"
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "version": "1.0",
+  "description": "Market-specific brand rules stored in P3 episodic memory at system bootstrap",
+  "rules": [
+    {
+      "brand_id": "OZEMPIC",
+      "market": "US",
+      "rule_type": "mlr_rejection",
+      "key": "rejected_phrase_significantly_reduces",
+      "value": "Do not use 'significantly reduces blood sugar' — MLR rejected 2024-Q3. Use approved claim: 'reduced HbA1c by 1.4% from baseline'",
+      "category": "mlr_feedback"
+    },
+    {
+      "brand_id": "OZEMPIC",
+      "market": "US",
+      "rule_type": "tone",
+      "key": "required_fair_balance",
+      "value": "Every efficacy claim must be paired with GI adverse reaction profile (nausea up to 20%) and thyroid C-cell tumor boxed warning",
+      "category": "compliance_rule"
+    },
+    {
+      "brand_id": "OZEMPIC",
+      "market": "DE",
+      "rule_type": "terminology",
+      "key": "approved_german_tone",
+      "value": "Use 'gut verträglich' for tolerability. Never use informal du-form. Always cite klinische Studie reference number.",
+      "category": "market_localization"
+    },
+    {
+      "brand_id": "KEYTRUDA",
+      "market": "US",
+      "rule_type": "mlr_rejection",
+      "key": "rejected_phrase_cure",
+      "value": "Never use 'cure' or 'curative' for KEYTRUDA. Use 'treatment' or 'therapy'. MLR standing rejection since 2022.",
+      "category": "mlr_feedback"
+    },
+    {
+      "brand_id": "KEYTRUDA",
+      "market": "US",
+      "rule_type": "biomarker",
+      "key": "pdl1_requirement",
+      "value": "Always specify PD-L1 expression requirement (TPS ≥1% or CPS ≥1) when claiming efficacy for NSCLC or HNSCC indications",
+      "category": "compliance_rule"
+    },
+    {
+      "brand_id": "HUMIRA",
+      "market": "US",
+      "rule_type": "biosimilar",
+      "key": "biosimilar_awareness",
+      "value": "HUMIRA now faces biosimilar competition (Hadlima, Cyltezo, Hyrimoz). Do not claim HUMIRA is 'the only' anti-TNF option. Always acknowledge biosimilar availability.",
+      "category": "market_context"
+    },
+    {
+      "brand_id": "HUMIRA",
+      "market": "DE",
+      "rule_type": "terminology",
+      "key": "german_tolerability_phrase",
+      "value": "For HUMIRA in Germany: use 'gut verträglich' for tolerability. Preferred term for injection site reaction: 'Reaktionen an der Injektionsstelle'",
+      "category": "market_localization"
+    },
+    {
+      "brand_id": "HUMIRA",
+      "market": "IN",
+      "rule_type": "access",
+      "key": "india_access_program",
+      "value": "In India market: reference AbbVie patient assistance program. HUMIRA citrate-free formulation preferred for injection site comfort messaging.",
+      "category": "market_localization"
+    }
+  ]
+}

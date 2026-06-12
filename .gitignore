@@ -1,0 +1,30 @@
+# Environment — never commit secrets
+backend/.env
+.env
+.env.local
+
+# Python
+backend/venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Runtime data (SQLite db rebuilds from JSON on startup)
+backend/data/memory/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Vercel
+.vercel/

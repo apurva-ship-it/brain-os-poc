@@ -1,0 +1,252 @@
+{
+  "brand_document_id": "KEYTRUDA-001",
+  "data_source": "FDA-approved Prescribing Information — Merck & Co. (DailyMed / FDA label, current as of 2025)",
+  "source_note": "Keytruda (pembrolizumab) has the most expansive oncology label in FDA history — 40+ approved indications. This document captures the core brand intelligence layer. Full label at DailyMed: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=keytruda",
+
+  "brand_metadata": {
+    "brand_name": "KEYTRUDA",
+    "generic_name": "pembrolizumab",
+    "manufacturer": "Merck Sharp & Dohme LLC",
+    "drug_class": "Anti-PD-1 monoclonal antibody / PD-1 blocker / Immune checkpoint inhibitor",
+    "therapeutic_area": "Oncology — multiple tumor types",
+    "route_of_administration": ["intravenous infusion"],
+    "dosage_form": "100 mg/4 mL solution for injection",
+    "approval_status": "FDA-approved",
+    "first_approval": "2014 (accelerated approval for melanoma)",
+    "approval_breadth": "40+ tumor type indications across adult and pediatric populations"
+  },
+
+  "indications": {
+    "approved_tumor_types": [
+      {
+        "indication_id": "IND-001",
+        "tumor_type": "Melanoma",
+        "indication_text": "Unresectable or metastatic melanoma; adjuvant treatment of melanoma with lymph node involvement following complete resection.",
+        "population": "Adults and pediatric patients 12+ years"
+      },
+      {
+        "indication_id": "IND-002",
+        "tumor_type": "Non-Small Cell Lung Cancer (NSCLC)",
+        "indication_text": "First-line treatment of metastatic NSCLC with PD-L1 expression (TPS ≥1%) as monotherapy or in combination with chemotherapy; second-line for PD-L1 TPS ≥1% post-platinum progression.",
+        "biomarker_required": "PD-L1 TPS ≥1% for some regimens; TPS ≥50% for monotherapy first-line",
+        "population": "Adults"
+      },
+      {
+        "indication_id": "IND-003",
+        "tumor_type": "Head and Neck Squamous Cell Carcinoma (HNSCC)",
+        "indication_text": "First-line treatment of metastatic or unresectable, recurrent HNSCC with PD-L1 CPS ≥1 as monotherapy or in combination with platinum and FU chemotherapy.",
+        "biomarker_required": "PD-L1 CPS ≥1",
+        "population": "Adults"
+      },
+      {
+        "indication_id": "IND-004",
+        "tumor_type": "Classical Hodgkin Lymphoma (cHL)",
+        "indication_text": "Relapsed or refractory cHL in adults and pediatric patients.",
+        "population": "Adults and pediatric patients"
+      },
+      {
+        "indication_id": "IND-005",
+        "tumor_type": "Urothelial Carcinoma",
+        "indication_text": "Locally advanced or metastatic urothelial carcinoma in patients who are not eligible for cisplatin-containing chemotherapy and whose tumors express PD-L1 (CPS ≥10), or any platinum ineligible patient; also second-line post-platinum.",
+        "biomarker_required": "PD-L1 CPS ≥10 for cisplatin-ineligible first-line monotherapy",
+        "population": "Adults"
+      },
+      {
+        "indication_id": "IND-006",
+        "tumor_type": "TMB-High / MSI-H / dMMR Tumors (Tumor Agnostic)",
+        "indication_text": "Adult and pediatric patients with unresectable or metastatic TMB-H (≥10 mut/Mb) solid tumors who have progressed on prior treatment with no satisfactory alternatives. Also MSI-H or dMMR solid tumors.",
+        "biomarker_required": "TMB-H ≥10 mutations/megabase OR MSI-H/dMMR status",
+        "note": "This is a tumor-agnostic approval — one of the first in oncology history"
+      },
+      {
+        "indication_id": "IND-007",
+        "tumor_type": "Gastric/Gastroesophageal Junction (GEJ) Adenocarcinoma",
+        "indication_text": "First-line treatment of locally advanced unresectable or metastatic HER2-positive gastric or GEJ adenocarcinoma in combination with trastuzumab and chemotherapy.",
+        "population": "Adults"
+      },
+      {
+        "indication_id": "IND-008",
+        "tumor_type": "Esophageal Cancer",
+        "indication_text": "First-line treatment of locally advanced or metastatic esophageal or GEJ cancer with PD-L1 CPS ≥10 in combination with platinum and fluoropyrimidine chemotherapy; also second-line monotherapy.",
+        "biomarker_required": "PD-L1 CPS ≥10 for some regimens"
+      },
+      {
+        "indication_id": "IND-009",
+        "tumor_type": "Cervical Cancer",
+        "indication_text": "Persistent, recurrent, or metastatic cervical cancer with PD-L1 expression (CPS ≥1) in combination with chemotherapy with or without bevacizumab.",
+        "biomarker_required": "PD-L1 CPS ≥1"
+      },
+      {
+        "indication_id": "IND-010",
+        "tumor_type": "Hepatocellular Carcinoma (HCC)",
+        "indication_text": "Second-line or later treatment of HCC in patients previously treated with sorafenib.",
+        "population": "Adults"
+      },
+      {
+        "indication_id": "IND-011",
+        "tumor_type": "Merkel Cell Carcinoma",
+        "indication_text": "Recurrent locally advanced or metastatic Merkel cell carcinoma.",
+        "population": "Adults and pediatric patients 12+ years"
+      },
+      {
+        "indication_id": "IND-012",
+        "tumor_type": "Renal Cell Carcinoma (RCC)",
+        "indication_text": "First-line treatment of advanced RCC in combination with axitinib; also in combination with lenvatinib for first-line advanced RCC.",
+        "population": "Adults"
+      },
+      {
+        "indication_id": "IND-013",
+        "tumor_type": "Endometrial Carcinoma",
+        "indication_text": "Advanced endometrial carcinoma not MSI-H or dMMR in combination with lenvatinib in patients who have progressed on prior systemic therapy. Also MSI-H/dMMR endometrial carcinoma as monotherapy.",
+        "population": "Adults"
+      },
+      {
+        "indication_id": "IND-014",
+        "tumor_type": "Triple-Negative Breast Cancer (TNBC)",
+        "indication_text": "High-risk, early-stage TNBC in combination with chemotherapy (neoadjuvant), then as single agent adjuvant; locally recurrent unresectable or metastatic TNBC with PD-L1 (CPS ≥10) in combination with chemotherapy.",
+        "biomarker_required": "PD-L1 CPS ≥10 for metastatic setting"
+      },
+      {
+        "indication_id": "IND-015",
+        "tumor_type": "Colorectal Cancer (CRC)",
+        "indication_text": "First-line treatment of unresectable or metastatic MSI-H or dMMR CRC.",
+        "biomarker_required": "MSI-H or dMMR",
+        "population": "Adults and pediatric patients 12+ years"
+      },
+      {
+        "indication_id": "IND-016",
+        "tumor_type": "Biliary Tract Cancer (BTC)",
+        "indication_text": "Locally advanced unresectable or metastatic BTC in combination with gemcitabine and cisplatin.",
+        "population": "Adults"
+      }
+    ],
+    "selection_note": "Above covers major indications. Full label lists additional regimens and populations — always consult current PI for complete indication language."
+  },
+
+  "mechanism_of_action": {
+    "moa_summary": "Pembrolizumab is a humanized monoclonal antibody that binds to the PD-1 receptor on T-cells and blocks the interaction with PD-L1 and PD-L2 ligands. This releases PD-1 pathway-mediated inhibition of immune response, including anti-tumor immune response.",
+    "key_mechanisms": [
+      "Blocks PD-1 / PD-L1 and PD-1 / PD-L2 interactions",
+      "Releases T-cell inhibition — restores anti-tumor immune response",
+      "IgG4/kappa isotype with Fc region modification to minimize Fc-mediated effector function"
+    ],
+    "biomarker_relevance": "PD-L1 expression (CPS or TPS by IHC 22C3 pharmDx) is required for patient selection in many indications. TMB-H and MSI-H/dMMR are additional biomarker-driven selection criteria."
+  },
+
+  "approved_claims": [
+    {
+      "claim_id": "CLM-001",
+      "claim_text": "KEYTRUDA is approved for more than 40 indications across more than 20 different tumor types — the broadest oncology label in FDA history.",
+      "claim_type": "Brand Breadth",
+      "note": "Substantiated by FDA approval history; always state current exact number as approvals continue"
+    },
+    {
+      "claim_id": "CLM-002",
+      "claim_text": "KEYTRUDA improved overall survival vs. chemotherapy in previously untreated metastatic NSCLC with PD-L1 TPS ≥50% (KEYNOTE-024).",
+      "claim_type": "Efficacy — Overall Survival, NSCLC",
+      "supporting_data": "KEYNOTE-024: median OS 26.3 months vs 14.2 months; HR 0.62 [95% CI: 0.48–0.81]",
+      "source": "KEYNOTE-024 trial"
+    },
+    {
+      "claim_id": "CLM-003",
+      "claim_text": "KEYTRUDA + chemotherapy improved overall survival in first-line metastatic NSCLC with PD-L1 TPS ≥1% regardless of histology (KEYNOTE-189 / KEYNOTE-407).",
+      "claim_type": "Efficacy — OS, NSCLC combination",
+      "supporting_data": "KEYNOTE-189 (non-squamous): HR 0.56 [95% CI: 0.45–0.70]; KEYNOTE-407 (squamous): HR 0.71 [95% CI: 0.58–0.88]"
+    },
+    {
+      "claim_id": "CLM-004",
+      "claim_text": "KEYTRUDA monotherapy demonstrated durable responses in advanced melanoma in patients who had not received prior therapy (KEYNOTE-006).",
+      "claim_type": "Efficacy — Melanoma OS",
+      "supporting_data": "KEYNOTE-006: OS HR 0.68 vs ipilimumab; 5-year OS rate 38% with pembrolizumab"
+    },
+    {
+      "claim_id": "CLM-005",
+      "claim_text": "KEYTRUDA is approved for treatment of TMB-High solid tumors regardless of tumor histology — a tissue-agnostic approval.",
+      "claim_type": "Efficacy — Tumor Agnostic (TMB-H)",
+      "supporting_data": "KEYNOTE-158, ORR 29% in TMB-H patients across 10 cohorts"
+    },
+    {
+      "claim_id": "CLM-006",
+      "claim_text": "KEYTRUDA improved event-free survival in early-stage TNBC when added to neoadjuvant chemotherapy (KEYNOTE-522).",
+      "claim_type": "Efficacy — TNBC EFS",
+      "supporting_data": "KEYNOTE-522: HR 0.63 [95% CI: 0.48–0.82] for EFS"
+    }
+  ],
+
+  "contraindications": [
+    {
+      "contraindication_id": "CI-001",
+      "text": "No absolute contraindications listed in the label per se, but pembrolizumab should not be used in patients with active, severe autoimmune disease requiring systemic immunosuppression (clinical judgment required).",
+      "note": "This is a clinical caution, not a formal FDA contraindication — consult current label"
+    }
+  ],
+
+  "boxed_warning": null,
+
+  "immune_mediated_adverse_reactions": {
+    "overview": "KEYTRUDA can cause severe and fatal immune-mediated adverse reactions (irAEs). These may involve any organ system and typically occur during treatment or after treatment discontinuation.",
+    "categories": [
+      "Immune-mediated pneumonitis (fatal cases reported)",
+      "Immune-mediated colitis",
+      "Immune-mediated hepatitis and hepatotoxicity",
+      "Immune-mediated endocrinopathies (hypophysitis, thyroid disorders, adrenal insufficiency, T1DM)",
+      "Immune-mediated nephritis with renal dysfunction",
+      "Immune-mediated dermatologic reactions (Stevens-Johnson Syndrome, toxic epidermal necrolysis)",
+      "Solid organ transplant rejection",
+      "Infusion-related reactions"
+    ],
+    "management_principle": "Withhold or permanently discontinue based on severity; treat with corticosteroids as appropriate. Hormone replacement for endocrinopathies.",
+    "source_section": "5 Warnings and Precautions"
+  },
+
+  "dosing": {
+    "standard_regimens": [
+      "200 mg IV every 3 weeks (Q3W)",
+      "400 mg IV every 6 weeks (Q6W)",
+      "2 mg/kg (up to 200 mg) IV Q3W for pediatric patients"
+    ],
+    "administration": "Intravenous infusion over 30 minutes. Do not administer as IV push or bolus.",
+    "duration": "Until disease progression, unacceptable toxicity, or maximum 24 months for adjuvant/certain indications",
+    "source_section": "2 Dosage and Administration"
+  },
+
+  "biomarker_testing_requirements": {
+    "required_companion_diagnostics": [
+      {
+        "biomarker": "PD-L1",
+        "test": "PD-L1 IHC 22C3 pharmDx (Dako/Agilent)",
+        "metric": "CPS (Combined Positive Score) or TPS (Tumor Proportion Score) depending on tumor type",
+        "indications_requiring": ["NSCLC", "HNSCC", "Gastric/GEJ", "Esophageal", "Cervical", "Urothelial", "TNBC (metastatic)"]
+      },
+      {
+        "biomarker": "MSI-H / dMMR",
+        "test": "FDA-approved MSI or MMR assay",
+        "indications_requiring": ["CRC (MSI-H/dMMR)", "Endometrial Carcinoma", "TMB-H/MSI-H tumor agnostic"]
+      },
+      {
+        "biomarker": "TMB-H",
+        "test": "FoundationOne CDx",
+        "threshold": "≥10 mutations per megabase",
+        "indications_requiring": ["Tumor-agnostic TMB-H solid tumors"]
+      }
+    ]
+  },
+
+  "marketing_content_rules": {
+    "mandatory_references": [
+      "All efficacy claims must reference specific KEYNOTE trial number and patient population",
+      "PD-L1 cutoff must be clearly stated when relevant to the approved indication",
+      "OS data should reference hazard ratio and confidence interval, not just median values"
+    ],
+    "prohibited_claims": [
+      "Do NOT use '40+ indications' without updating to current approved count",
+      "Do NOT claim efficacy in tumor types without the required biomarker selection unless biomarker-unselected data exists",
+      "Do NOT imply irAEs are mild — fatal cases have been reported across categories"
+    ],
+    "required_fair_balance": [
+      "Immune-mediated adverse reactions (multiple categories, some fatal)",
+      "Infusion-related reactions",
+      "Embryo-fetal toxicity (advise patients of reproductive potential)"
+    ]
+  }
+}

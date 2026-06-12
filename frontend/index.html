@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brain OS — Memory Layer POC</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --p1: #ef4444; --p1-light: #fef2f2; --p1-border: #fca5a5;
+    --p2: #3b82f6; --p2-light: #eff6ff; --p2-border: #93c5fd;
+    --p3: #8b5cf6; --p3-light: #f5f3ff; --p3-border: #c4b5fd;
+    --p4: #10b981; --p4-light: #ecfdf5; --p4-border: #6ee7b7;
+    --p5: #f59e0b; --p5-light: #fffbeb; --p5-border: #fcd34d;
+  }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; }
+  .tier-p1 { border-color: var(--p1-border); background: var(--p1-light); color: #7f1d1d; }
+  .tier-p2 { border-color: var(--p2-border); background: var(--p2-light); color: #1e3a5f; }
+  .tier-p3 { border-color: var(--p3-border); background: var(--p3-light); color: #4c1d95; }
+  .tier-p4 { border-color: var(--p4-border); background: var(--p4-light); color: #064e3b; }
+  .tier-p5 { border-color: var(--p5-border); background: var(--p5-light); color: #78350f; }
+  .pill { @apply text-xs font-bold px-2 py-0.5 rounded-full inline-block; }
+  .pill-p1 { background: #ef4444; color: white; }
+  .pill-p2 { background: #3b82f6; color: white; }
+  .pill-p3 { background: #8b5cf6; color: white; }
+  .pill-p4 { background: #10b981; color: white; }
+  .pill-p5 { background: #f59e0b; color: white; }
+  .pill-off { background: #475569; color: #94a3b8; }
+  .tier-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-on { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+  .dot-off { background: #475569; }
+  .dot-block { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+  .chat-bubble-user { background: #1e40af; border-radius: 18px 18px 4px 18px; }
+  .chat-bubble-bot { background: #1e293b; border-radius: 18px 18px 18px 4px; border: 1px solid #334155; }
+  .chat-bubble-blocked { background: #450a0a; border: 1px solid #ef4444; border-radius: 18px 18px 18px 4px; }
+  .tab-active { border-bottom: 2px solid #6366f1; color: #818cf8; }
+  .tab-inactive { color: #64748b; }
+  .scenario-btn { transition: all 0.2s; }
+  .scenario-btn:hover { transform: translateY(-1px); }
+  .mem-entry { border-left: 3px solid; padding: 6px 10px; margin: 4px 0; border-radius: 0 6px 6px 0; font-size: 12px; }
+  .spin { animation: spin 1s linear infinite; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .fade-in { animation: fadeIn 0.3s ease-in; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .glow-p1 { box-shadow: 0 0 12px rgba(239,68,68,0.4); }
+  .glow-p3 { box-shadow: 0 0 12px rgba(139,92,246,0.4); }
+  .glow-p4 { box-shadow: 0 0 12px rgba(16,185,129,0.4); }
+  pre { white-space: pre-wrap; word-break: break-word; }
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #1e293b; }
+  ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+</style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+<!-- Header -->
+<header class="bg-slate-900 border-b border-slate-700 px-4 py-2 flex items-center gap-4 shrink-0">
+  <div class="flex items-center gap-2">
+    <div class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-xs font-bold">B</div>
+    <span class="font-bold text-white">Brain OS</span>
+    <span class="text-slate-500 text-xs">Pharma Memory Layer POC</span>
+  </div>
+  <div class="flex-1"></div>
+  <!-- Session & User controls -->
+  <div class="flex items-center gap-3 text-sm">
+    <div class="flex items-center gap-2">
+      <span class="text-slate-400 text-xs">User:</span>
+      <input id="userId" type="text" value="apurva" placeholder="your-name"
+        class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-xs text-white w-24">
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-slate-400 text-xs">Brand:</span>
+      <select id="brandSelect" class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-xs text-white">
+        <option value="">— none —</option>
+        <option value="OZEMPIC">OZEMPIC</option>
+        <option value="KEYTRUDA">KEYTRUDA</option>
+        <option value="HUMIRA">HUMIRA</option>
+      </select>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-slate-400 text-xs">Market:</span>
+      <select id="marketSelect" class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-xs text-white">
+        <option value="">— none —</option>
+        <option value="US">US</option>
+        <option value="DE">Germany</option>
+        <option value="IN">India</option>
+        <option value="EU">EU</option>
+      </select>
+    </div>
+    <button onclick="newSession()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded-lg transition">
+      + New Session
+    </button>
+    <div class="text-xs text-slate-500">
+      Session: <span id="sessionDisplay" class="text-indigo-400 font-mono">—</span>
+    </div>
+  </div>
+</header>
+
+<!-- Tabs -->
+<div class="bg-slate-900 border-b border-slate-700 flex px-4 shrink-0">
+  <button onclick="switchTab('chat')" id="tab-chat" class="tab-active text-sm px-4 py-2 font-medium transition">💬 Chat</button>
+  <button onclick="switchTab('demos')" id="tab-demos" class="tab-inactive text-sm px-4 py-2 font-medium transition">🎯 Demo Scenarios</button>
+  <button onclick="switchTab('inspector')" id="tab-inspector" class="tab-inactive text-sm px-4 py-2 font-medium transition">🔬 Memory Inspector</button>
+  <button onclick="switchTab('docs')" id="tab-docs" class="tab-inactive text-sm px-4 py-2 font-medium transition">📄 Documents</button>
+</div>
+
+<!-- Main layout -->
+<div class="flex flex-1 overflow-hidden">
+
+  <!-- Left sidebar — Memory Layer Status -->
+  <aside class="w-56 bg-slate-900 border-r border-slate-700 flex flex-col overflow-y-auto shrink-0 p-3">
+    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Memory Layers</div>
+
+    <div id="tier-p1" class="mb-2 p-2 rounded-lg border border-slate-700 bg-slate-800 cursor-pointer hover:border-red-500 transition" onclick="focusTier('P1')">
+      <div class="flex items-center justify-between mb-1">
+        <div class="flex items-center gap-1.5">
+          <span class="tier-dot dot-on" id="dot-p1"></span>
+          <span class="text-xs font-bold text-red-400">P1</span>
+          <span class="text-xs text-slate-300">Guardrails</span>
+        </div>
+        <span class="pill pill-p1 text-xs" id="badge-p1">ACTIVE</span>
+      </div>
+      <div class="text-xs text-slate-500 leading-tight">Always-on compliance rules. Never bypassed.</div>
+      <div class="text-xs text-red-400 mt-1" id="p1-status">Loaded ✓</div>
+    </div>
+
+    <div id="tier-p2" class="mb-2 p-2 rounded-lg border border-slate-700 bg-slate-800 cursor-pointer hover:border-blue-500 transition" onclick="focusTier('P2')">
+      <div class="flex items-center justify-between mb-1">
+        <div class="flex items-center gap-1.5">
+          <span class="tier-dot dot-off" id="dot-p2"></span>
+          <span class="text-xs font-bold text-blue-400">P2</span>
+          <span class="text-xs text-slate-300">Session</span>
+        </div>
+        <span class="pill pill-off text-xs" id="badge-p2">IDLE</span>
+      </div>
+      <div class="text-xs text-slate-500 leading-tight">This session only. Cleared on close.</div>
+      <div class="text-xs text-blue-400 mt-1" id="p2-status">No active session</div>
+    </div>
+
+    <div id="tier-p3" class="mb-2 p-2 rounded-lg border border-slate-700 bg-slate-800 cursor-pointer hover:border-purple-500 transition" onclick="focusTier('P3')">
+      <div class="flex items-center justify-between mb-1">
+        <div class="flex items-center gap-1.5">
+          <span class="tier-dot dot-off" id="dot-p3"></span>
+          <span class="text-xs font-bold text-purple-400">P3</span>
+          <span class="text-xs text-slate-300">Episodic</span>
+        </div>
+        <span class="pill pill-off text-xs" id="badge-p3">IDLE</span>
+      </div>
+      <div class="text-xs text-slate-500 leading-tight">Persists across sessions. User + Brand memory.</div>
+      <div class="text-xs text-purple-400 mt-1" id="p3-status">0 memories</div>
+    </div>
+
+    <div id="tier-p4" class="mb-2 p-2 rounded-lg border border-slate-700 bg-slate-800 cursor-pointer hover:border-green-500 transition" onclick="focusTier('P4')">
+      <div class="flex items-center justify-between mb-1">
+        <div class="flex items-center gap-1.5">
+          <span class="tier-dot dot-off" id="dot-p4"></span>
+          <span class="text-xs font-bold text-green-400">P4</span>
+          <span class="text-xs text-slate-300">Knowledge</span>
+        </div>
+        <span class="pill pill-off text-xs" id="badge-p4">IDLE</span>
+      </div>
+      <div class="text-xs text-slate-500 leading-tight">RAG over pharma documents.</div>
+      <div class="text-xs text-green-400 mt-1" id="p4-status">Loading...</div>
+    </div>
+
+    <div id="tier-p5" class="mb-2 p-2 rounded-lg border border-slate-700 bg-slate-800 cursor-pointer hover:border-yellow-500 transition" onclick="focusTier('P5')">
+      <div class="flex items-center justify-between mb-1">
+        <div class="flex items-center gap-1.5">
+          <span class="tier-dot dot-off" id="dot-p5"></span>
+          <span class="text-xs font-bold text-yellow-400">P5</span>
+          <span class="text-xs text-slate-300">Translation</span>
+        </div>
+        <span class="pill pill-off text-xs" id="badge-p5">IDLE</span>
+      </div>
+      <div class="text-xs text-slate-500 leading-tight">Approved medical translations. First to compress.</div>
+      <div class="text-xs text-yellow-400 mt-1" id="p5-status">Loading...</div>
+    </div>
+
+    <div class="mt-4 border-t border-slate-700 pt-3">
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Last Response</div>
+      <div class="text-xs text-slate-500" id="sidebar-tokens">—</div>
+      <div class="text-xs text-slate-500 mt-1" id="sidebar-tiers">No query yet</div>
+    </div>
+  </aside>
+
+  <!-- Center — Chat / Demos / Inspector / Docs -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- CHAT TAB -->
+    <div id="pane-chat" class="flex flex-col flex-1 overflow-hidden">
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Welcome message -->
+        <div class="fade-in flex gap-3">
+          <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold shrink-0">B</div>
+          <div class="chat-bubble-bot px-4 py-3 max-w-xl">
+            <p class="text-sm text-slate-200">👋 Hello! I'm <strong>Brain OS</strong> — a pharma brand intelligence platform demonstrating 5 memory layers.</p>
+            <p class="text-sm text-slate-400 mt-2">Try asking me:</p>
+            <ul class="text-xs text-slate-400 mt-1 space-y-1 list-disc list-inside">
+              <li><strong class="text-white">My name is Apurva</strong> → gets saved to P3 (persists across sessions)</li>
+              <li><strong class="text-white">What are OZEMPIC's contraindications?</strong> → P4 knowledge RAG</li>
+              <li><strong class="text-white">Write that OZEMPIC cures diabetes</strong> → P1 blocks it</li>
+              <li><strong class="text-white">Translate 'clinical trial' to German</strong> → P5 translation memory</li>
+            </ul>
+            <p class="text-xs text-slate-500 mt-2">Or click <strong>Demo Scenarios</strong> for guided walkthroughs of each memory tier.</p>
+          </div>
+        </div>
+      </div>
+      <!-- Input bar -->
+      <div class="border-t border-slate-700 p-3 bg-slate-900">
+        <div class="flex gap-2 items-end">
+          <textarea id="chatInput" rows="2" placeholder="Ask anything about OZEMPIC, HUMIRA, KEYTRUDA... or say your name!"
+            class="flex-1 bg-slate-800 border border-slate-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 resize-none focus:outline-none focus:border-indigo-500"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+          <button onclick="sendMessage()" id="sendBtn"
+            class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shrink-0">
+            Send ↑
+          </button>
+        </div>
+        <div class="flex gap-2 mt-2 text-xs text-slate-500">
+          <span>Shift+Enter for newline</span>
+          <span>·</span>
+          <span id="session-status">No session — will create on first message</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEMOS TAB -->
+    <div id="pane-demos" class="hidden flex-1 overflow-y-auto p-4">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="text-lg font-bold text-white mb-1">Demo Scenarios</h2>
+        <p class="text-slate-400 text-sm mb-6">Click a scenario to load guided steps. Each one demonstrates a specific memory layer.</p>
+        <div id="scenarios-grid" class="grid grid-cols-2 gap-4"></div>
+      </div>
+    </div>
+
+    <!-- INSPECTOR TAB -->
+    <div id="pane-inspector" class="hidden flex-1 overflow-y-auto p-4">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold text-white">Memory Inspector</h2>
+          <button onclick="loadInspector()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded-lg">Refresh ↻</button>
+        </div>
+        <div id="inspector-content" class="space-y-4">
+          <p class="text-slate-500 text-sm">Click Refresh to load current memory state.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCS TAB -->
+    <div id="pane-docs" class="hidden flex-1 overflow-y-auto p-4">
+      <div class="max-w-2xl mx-auto">
+        <h2 class="text-lg font-bold text-white mb-1">Knowledge Base Documents (P4)</h2>
+        <p class="text-slate-400 text-sm mb-4">Documents pre-loaded at startup. You can add more text documents.</p>
+        <div id="docs-stats" class="mb-4 p-3 bg-slate-800 rounded-lg border border-slate-700"></div>
+        <div class="bg-slate-800 rounded-lg border border-slate-700 p-4">
+          <h3 class="text-sm font-bold text-white mb-3">Add Custom Text to Knowledge Base</h3>
+          <div class="space-y-3">
+            <input type="text" id="docBrandId" placeholder="Brand ID (e.g. OZEMPIC)" value="OZEMPIC"
+              class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-sm text-white">
+            <input type="text" id="docSection" placeholder="Section name (e.g. Market Research Q4 2025)" value="Custom Note"
+              class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-sm text-white">
+            <textarea id="docText" rows="4" placeholder="Paste text content here..."
+              class="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-sm text-white resize-none"></textarea>
+            <button onclick="addDocument()" class="bg-green-700 hover:bg-green-600 text-white text-sm px-4 py-2 rounded-lg">
+              Add to Knowledge Base
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Right panel — Memory Trace -->
+  <aside class="w-72 bg-slate-900 border-l border-slate-700 flex flex-col overflow-hidden shrink-0">
+    <div class="border-b border-slate-700 p-3 flex items-center justify-between">
+      <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">Memory Trace</span>
+      <span class="text-xs text-slate-500">Last query</span>
+    </div>
+    <div id="trace-panel" class="flex-1 overflow-y-auto p-3 space-y-2">
+      <p class="text-xs text-slate-500 text-center mt-8">Send a message to see which memory layers activate and what they contribute.</p>
+    </div>
+  </aside>
+
+</div>
+
+<!-- Demo step modal -->
+<div id="demo-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+  <div class="bg-slate-800 rounded-xl border border-slate-600 w-full max-w-lg mx-4">
+    <div class="flex items-center justify-between p-4 border-b border-slate-700">
+      <div>
+        <div id="modal-title" class="font-bold text-white"></div>
+        <div id="modal-tier" class="text-xs mt-0.5"></div>
+      </div>
+      <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl">×</button>
+    </div>
+    <div id="modal-steps" class="p-4 space-y-3 max-h-96 overflow-y-auto"></div>
+    <div class="p-4 border-t border-slate-700 flex gap-2">
+      <button id="prev-step-btn" onclick="prevStep()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-3 py-2 rounded-lg">← Prev</button>
+      <button id="next-step-btn" onclick="nextStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-3 py-2 rounded-lg font-medium">Run Step →</button>
+      <button onclick="closeModal()" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-3 py-2 rounded-lg">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// On Vercel the frontend is served by the same origin as the API
+const API = window.location.hostname === 'localhost' ? 'http://localhost:8001' : window.location.origin;
+let sessionId = null;
+let currentScenario = null;
+let currentStep = 0;
+
+// ── Session management ────────────────────────────────────────────────────────
+
+async function newSession() {
+  const userId = document.getElementById('userId').value || 'user1';
+  const brandId = document.getElementById('brandSelect').value || null;
+  const market = document.getElementById('marketSelect').value || null;
+  const params = new URLSearchParams({ user_id: userId });
+  if (brandId) params.append('brand_id', brandId);
+  if (market) params.append('market', market);
+  const res = await fetch(`${API}/chat/session?${params}`, { method: 'POST' });
+  const data = await res.json();
+  sessionId = data.session_id;
+  updateSessionDisplay();
+  addSystemMessage(`New session started: ${sessionId}. Previous session context (P2) cleared. Your personal memories (P3) are still intact.`);
+}
+
+function updateSessionDisplay() {
+  document.getElementById('sessionDisplay').textContent = sessionId || '—';
+  document.getElementById('session-status').textContent = sessionId ? `Session: ${sessionId}` : 'No session';
+  if (sessionId) {
+    document.getElementById('dot-p2').className = 'tier-dot dot-on';
+    document.getElementById('badge-p2').textContent = 'ACTIVE';
+    document.getElementById('badge-p2').className = 'pill pill-p2 text-xs';
+    document.getElementById('p2-status').textContent = `Session ${sessionId}`;
+  }
+}
+
+// ── Chat ──────────────────────────────────────────────────────────────────────
+
+async function sendMessage(override = null) {
+  const input = document.getElementById('chatInput');
+  const message = override || input.value.trim();
+  if (!message) return;
+
+  const userId = document.getElementById('userId').value || 'user1';
+  const brandId = document.getElementById('brandSelect').value || null;
+  const market = document.getElementById('marketSelect').value || null;
+
+  // Auto-create session if needed
+  if (!sessionId) {
+    const params = new URLSearchParams({ user_id: userId });
+    if (brandId) params.append('brand_id', brandId);
+    if (market) params.append('market', market);
+    const res = await fetch(`${API}/chat/session?${params}`, { method: 'POST' });
+    const data = await res.json();
+    sessionId = data.session_id;
+    updateSessionDisplay();
+  }
+
+  // Add user bubble
+  addUserBubble(message);
+  input.value = '';
+
+  // Show loading
+  const loadingId = addLoadingBubble();
+  document.getElementById('sendBtn').disabled = true;
+
+  try {
+    const body = { message, session_id: sessionId, user_id: userId };
+    if (brandId) body.brand_id = brandId;
+    if (market) body.market = market;
+
+    const res = await fetch(`${API}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    removeLoading(loadingId);
+    addBotBubble(data.response, data.blocked, data.memory_trace, data.context_summary);
+    updateTierUI(data.memory_trace, data.context_summary);
+    renderTrace(data.memory_trace, data.context_summary);
+  } catch (e) {
+    removeLoading(loadingId);
+    addSystemMessage(`Error: ${e.message}. Make sure the backend is running at ${API}`);
+  }
+  document.getElementById('sendBtn').disabled = false;
+}
+
+// ── Bubble helpers ─────────────────────────────────────────────────────────────
+
+function addUserBubble(text) {
+  const div = document.createElement('div');
+  div.className = 'fade-in flex gap-3 justify-end';
+  div.innerHTML = `<div class="chat-bubble-user px-4 py-3 max-w-xl text-sm text-white">${escapeHtml(text)}</div>
+    <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-xs shrink-0">👤</div>`;
+  document.getElementById('chat-messages').appendChild(div);
+  scrollChat();
+}
+
+function addBotBubble(text, blocked, trace, summary) {
+  const div = document.createElement('div');
+  div.className = 'fade-in flex gap-3';
+  const bubbleClass = blocked ? 'chat-bubble-blocked' : 'chat-bubble-bot';
+
+  // Active tiers badges
+  let tierBadges = '';
+  if (summary && summary.active_tiers) {
+    tierBadges = summary.active_tiers.map(t => `<span class="pill pill-${t.toLowerCase()} text-xs mr-1">${t}</span>`).join('');
+  }
+
+  // Stored memories indicator
+  let memStored = '';
+  if (summary && summary.new_memories_stored > 0) {
+    memStored = `<div class="mt-2 text-xs text-purple-400">💾 ${summary.new_memories_stored} new memory(ies) saved to P3</div>`;
+    if (summary.stored_facts) {
+      summary.stored_facts.forEach(f => {
+        memStored += `<div class="text-xs text-purple-300 ml-4">· ${f.key}: ${f.value}</div>`;
+      });
+    }
+  }
+
+  div.innerHTML = `
+    <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold shrink-0">${blocked ? '⛔' : 'B'}</div>
+    <div class="${bubbleClass} px-4 py-3 max-w-xl">
+      <div class="text-sm text-slate-200 whitespace-pre-wrap">${escapeHtml(text)}</div>
+      ${tierBadges ? `<div class="mt-2">${tierBadges}</div>` : ''}
+      ${memStored}
+      ${summary && summary.total_tokens ? `<div class="text-xs text-slate-500 mt-1">~${summary.total_tokens} context tokens</div>` : ''}
+    </div>`;
+  document.getElementById('chat-messages').appendChild(div);
+  scrollChat();
+}
+
+function addSystemMessage(text) {
+  const div = document.createElement('div');
+  div.className = 'fade-in flex justify-center';
+  div.innerHTML = `<div class="text-xs text-slate-500 bg-slate-800 border border-slate-700 rounded-full px-3 py-1">${escapeHtml(text)}</div>`;
+  document.getElementById('chat-messages').appendChild(div);
+  scrollChat();
+}
+
+let loadingCounter = 0;
+function addLoadingBubble() {
+  const id = `loading-${++loadingCounter}`;
+  const div = document.createElement('div');
+  div.id = id;
+  div.className = 'fade-in flex gap-3';
+  div.innerHTML = `<div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold shrink-0">B</div>
+    <div class="chat-bubble-bot px-4 py-3">
+      <div class="flex items-center gap-2 text-xs text-slate-400">
+        <svg class="spin w-3 h-3" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#4f46e5" stroke-width="3" stroke-dasharray="30 60"/></svg>
+        Assembling memory context (P1→P5)...
+      </div>
+    </div>`;
+  document.getElementById('chat-messages').appendChild(div);
+  scrollChat();
+  return id;
+}
+function removeLoading(id) { document.getElementById(id)?.remove(); }
+function scrollChat() {
+  const el = document.getElementById('chat-messages');
+  el.scrollTop = el.scrollHeight;
+}
+
+// ── Memory Trace Panel ────────────────────────────────────────────────────────
+
+function renderTrace(trace, summary) {
+  const panel = document.getElementById('trace-panel');
+  panel.innerHTML = '';
+
+  const tiers = [
+    { key: 'P1', label: 'Guardrails', color: 'red', icon: '🛡️' },
+    { key: 'P2', label: 'Session', color: 'blue', icon: '📋' },
+    { key: 'P3', label: 'Episodic', color: 'purple', icon: '🧠' },
+    { key: 'P4', label: 'Knowledge', color: 'green', icon: '📚' },
+    { key: 'P5', label: 'Translation', color: 'yellow', icon: '🌍' },
+  ];
+
+  for (const t of tiers) {
+    const data = trace[t.key];
+    if (!data) continue;
+    const hit = data.hit;
+    const blocked = data.blocked;
+
+    const card = document.createElement('div');
+    card.className = `border rounded-lg p-2 tier-${t.key.toLowerCase()} text-xs mb-1`;
+
+    // Header
+    const status = blocked ? '⛔ BLOCKED' : hit ? `✓ ${data.latency_ms}ms` : '— not needed';
+    const statusColor = blocked ? 'text-red-600' : hit ? 'text-green-700' : 'text-slate-400';
+
+    card.innerHTML = `<div class="flex items-center justify-between mb-1">
+      <span class="font-bold">${t.icon} ${t.key} — ${t.label}</span>
+      <span class="font-mono ${statusColor} text-xs">${status}</span>
+    </div>`;
+
+    // Violations (P1)
+    if (data.violations && data.violations.length > 0) {
+      data.violations.forEach(v => {
+        card.innerHTML += `<div class="mt-1 p-1.5 bg-red-100 border border-red-300 rounded text-red-700">
+          <strong>${v.name}</strong><br>${v.message.substring(0,120)}...
+        </div>`;
+      });
+    }
+
+    // Contributions
+    if (data.contributions) {
+      data.contributions.slice(0, 4).forEach(c => {
+        if (c.type === 'status') {
+          card.innerHTML += `<div class="text-slate-400 mt-1 italic">${c.message}</div>`;
+        } else if (c.type === 'knowledge_chunk') {
+          card.innerHTML += `<div class="mt-1 p-1.5 bg-green-50 border border-green-200 rounded">
+            <span class="font-bold text-green-800">${c.brand} · ${c.section}</span><br>
+            <span class="text-green-700">${c.preview.substring(0,100)}...</span>
+          </div>`;
+        } else if (c.type === 'exact_match') {
+          card.innerHTML += `<div class="mt-1 p-1.5 bg-yellow-50 border border-yellow-200 rounded">
+            <span class="font-bold">TM Exact Hit</span> ${c.source_term} → <strong>${c.translation}</strong>
+          </div>`;
+        } else if (c.type === 'fuzzy_match') {
+          card.innerHTML += `<div class="mt-1 p-1.5 bg-yellow-50 border border-yellow-200 rounded">
+            <span class="font-bold">TM Fuzzy Hit</span> (${Math.round(c.confidence*100)}%) → <strong>${c.translation}</strong>
+          </div>`;
+        } else if (c.type === 'tm_miss') {
+          card.innerHTML += `<div class="mt-1 p-1.5 bg-orange-50 border border-orange-200 rounded text-orange-700">
+            ⚠ TM Miss — LLM used, needs MLR approval
+          </div>`;
+        } else if (['user_memory', 'brand_memory', 'market_memory'].includes(c.type)) {
+          const tag = c.type === 'user_memory' ? 'USER' : c.type === 'brand_memory' ? 'BRAND' : 'MARKET';
+          card.innerHTML += `<div class="mt-1"><span class="font-bold">[${tag}]</span> ${c.key}: ${c.value.substring(0,80)}</div>`;
+        } else if (['brand_context', 'market_context', 'session_preference'].includes(c.type)) {
+          card.innerHTML += `<div class="mt-1">→ ${c.key}: <strong>${c.value}</strong></div>`;
+        } else if (c.type === 'conversation_history') {
+          card.innerHTML += `<div class="mt-1 text-slate-500 italic">→ ${c.value}</div>`;
+        } else if (c.type === 'rules_loaded') {
+          card.innerHTML += `<div class="mt-1">→ ${c.count} rules checked (${c.brand})</div>`;
+        }
+      });
+    }
+
+    if (data.token_estimate > 0) {
+      card.innerHTML += `<div class="mt-1 text-right text-slate-500">~${data.token_estimate} tokens</div>`;
+    }
+
+    panel.appendChild(card);
+  }
+
+  // Stored memories section
+  if (trace['P3'] && trace['P3'].stored_facts && trace['P3'].stored_facts.length > 0) {
+    const memDiv = document.createElement('div');
+    memDiv.className = 'border border-purple-300 rounded-lg p-2 bg-purple-50 text-xs';
+    memDiv.innerHTML = `<div class="font-bold text-purple-700 mb-1">💾 New Memories Stored (P3)</div>`;
+    trace['P3'].stored_facts.forEach(f => {
+      memDiv.innerHTML += `<div class="text-purple-600">· [${f.category}] ${f.key}: ${f.value}</div>`;
+    });
+    panel.appendChild(memDiv);
+  }
+}
+
+// ── Tier sidebar status update ────────────────────────────────────────────────
+
+function updateTierUI(trace, summary) {
+  const tiers = ['P1', 'P2', 'P3', 'P4', 'P5'];
+  for (const t of tiers) {
+    const data = trace[t];
+    if (!data) continue;
+    const dotEl = document.getElementById(`dot-${t.toLowerCase()}`);
+    const badgeEl = document.getElementById(`badge-${t.toLowerCase()}`);
+    const statusEl = document.getElementById(`${t.toLowerCase()}-status`);
+
+    if (data.blocked) {
+      dotEl.className = 'tier-dot dot-block';
+      badgeEl.textContent = 'BLOCKED';
+      badgeEl.className = 'pill pill-p1 text-xs';
+      statusEl.textContent = `Blocked — ${data.violations?.length || 0} violation(s)`;
+    } else if (data.hit) {
+      dotEl.className = 'tier-dot dot-on';
+      badgeEl.textContent = 'HIT';
+      badgeEl.className = `pill pill-${t.toLowerCase()} text-xs`;
+      statusEl.textContent = `${data.contributions?.filter(c=>c.type!=='status').length || 0} contributions · ${data.latency_ms}ms`;
+    } else {
+      dotEl.className = 'tier-dot dot-off';
+      badgeEl.textContent = 'IDLE';
+      badgeEl.className = 'pill pill-off text-xs';
+      statusEl.textContent = data.contributions?.[0]?.message || 'Not needed';
+    }
+  }
+
+  if (summary) {
+    document.getElementById('sidebar-tokens').textContent = `~${summary.total_tokens} context tokens`;
+    document.getElementById('sidebar-tiers').textContent = `Active: ${summary.active_tiers?.join(', ') || '—'}`;
+  }
+}
+
+// ── Demo Scenarios ────────────────────────────────────────────────────────────
+
+const tierColors = { P1: 'red', P2: 'blue', P3: 'purple', P4: 'green', P5: 'yellow' };
+const tierBorderMap = { P1: 'border-red-500', P2: 'border-blue-500', P3: 'border-purple-500', P4: 'border-green-500', P5: 'border-yellow-500' };
+
+async function loadScenarios() {
+  const res = await fetch(`${API}/demo/scenarios`);
+  const data = await res.json();
+  const grid = document.getElementById('scenarios-grid');
+  grid.innerHTML = '';
+  for (const s of data.scenarios) {
+    const color = tierColors[s.tier] || 'slate';
+    const div = document.createElement('div');
+    div.className = `scenario-btn bg-slate-800 border border-slate-600 hover:border-${color}-500 rounded-xl p-4 cursor-pointer transition`;
+    div.onclick = () => openScenario(s);
+    div.innerHTML = `<div class="flex items-center gap-2 mb-2">
+        <span class="text-2xl">${s.icon}</span>
+        <div>
+          <span class="pill pill-${s.tier.toLowerCase()} text-xs">${s.tier}</span>
+          <div class="font-bold text-white text-sm mt-0.5">${s.title}</div>
+        </div>
+      </div>
+      <p class="text-xs text-slate-400">${s.description}</p>
+      <div class="mt-2 text-xs text-slate-500">${s.steps.length} steps</div>`;
+    grid.appendChild(div);
+  }
+}
+
+function openScenario(scenario) {
+  currentScenario = scenario;
+  currentStep = 0;
+  document.getElementById('modal-title').textContent = `${scenario.icon} ${scenario.title}`;
+  document.getElementById('modal-tier').innerHTML = `<span class="pill pill-${scenario.tier.toLowerCase()} text-xs">${scenario.tier}</span> <span class="text-slate-400">${scenario.description}</span>`;
+  renderModalSteps();
+  document.getElementById('demo-modal').classList.remove('hidden');
+}
+
+function renderModalSteps() {
+  const container = document.getElementById('modal-steps');
+  container.innerHTML = '';
+  currentScenario.steps.forEach((step, i) => {
+    const div = document.createElement('div');
+    const isActive = i === currentStep;
+    const isDone = i < currentStep;
+    div.className = `p-3 rounded-lg border ${isActive ? `border-indigo-500 bg-slate-700` : isDone ? 'border-green-700 bg-slate-800 opacity-60' : 'border-slate-600 bg-slate-800'}`;
+    div.innerHTML = `<div class="flex items-start gap-2">
+      <span class="text-xs font-bold ${isActive ? 'text-indigo-400' : isDone ? 'text-green-400' : 'text-slate-500'} shrink-0 mt-0.5">Step ${i+1}</span>
+      <div>
+        <div class="text-xs text-slate-300 italic mb-1">${step.instruction}</div>
+        ${step.message !== 'CREATE_NEW_SESSION'
+          ? `<div class="text-xs font-mono bg-slate-900 rounded px-2 py-1 text-green-300">"${step.message}"</div>`
+          : `<div class="text-xs font-mono bg-slate-900 rounded px-2 py-1 text-blue-300">🔄 Create New Session</div>`}
+      </div>
+    </div>`;
+    container.appendChild(div);
+  });
+  document.getElementById('prev-step-btn').disabled = currentStep === 0;
+}
+
+async function nextStep() {
+  if (!currentScenario || currentStep >= currentScenario.steps.length) return;
+  const step = currentScenario.steps[currentStep];
+  closeModal();
+  switchTab('chat');
+
+  if (step.message === 'CREATE_NEW_SESSION') {
+    await newSession();
+  } else {
+    document.getElementById('chatInput').value = step.message;
+    await sendMessage(step.message);
+  }
+
+  currentStep++;
+  if (currentStep < currentScenario.steps.length) {
+    openScenario(currentScenario);
+  }
+}
+
+function prevStep() {
+  if (currentStep > 0) { currentStep--; renderModalSteps(); }
+}
+function closeModal() { document.getElementById('demo-modal').classList.add('hidden'); }
+
+// ── Memory Inspector ──────────────────────────────────────────────────────────
+
+async function loadInspector() {
+  const userId = document.getElementById('userId').value || 'user1';
+  const brandId = document.getElementById('brandSelect').value || null;
+  const market = document.getElementById('marketSelect').value || null;
+
+  let url = `${API}/memory/inspector?user_id=${userId}`;
+  if (brandId) url += `&brand_id=${brandId}`;
+  if (market) url += `&market=${market}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+  const content = document.getElementById('inspector-content');
+  content.innerHTML = '';
+
+  const sections = [
+    { key: 'P1_guardrails', label: 'P1 — Guardrails', color: 'red', icon: '🛡️' },
+    { key: 'P2_sessions', label: 'P2 — Session Memory', color: 'blue', icon: '📋' },
+    { key: 'P3_user_memory', label: 'P3 — User Memory (all sessions)', color: 'purple', icon: '👤' },
+    { key: 'P3_brand_memory', label: 'P3 — Brand/Market Memory', color: 'purple', icon: '🏥' },
+    { key: 'P4_knowledge', label: 'P4 — Knowledge Base', color: 'green', icon: '📚' },
+    { key: 'P5_translation', label: 'P5 — Translation Memory', color: 'yellow', icon: '🌍' },
+  ];
+
+  for (const s of sections) {
+    const tier = data[s.key];
+    if (!tier) continue;
+    const div = document.createElement('div');
+    div.className = `bg-slate-800 border border-slate-700 rounded-xl p-4`;
+    div.innerHTML = `<h3 class="font-bold text-white mb-3">${s.icon} ${s.label}</h3>`;
+
+    if (s.key === 'P1_guardrails') {
+      div.innerHTML += `<div class="text-xs text-slate-400 mb-2">${tier.count} rules loaded</div>`;
+      (tier.rules || []).slice(0, 5).forEach(r => {
+        div.innerHTML += `<div class="mem-entry border-red-400 bg-red-50 text-xs text-red-800">
+          <strong>${r.rule_id}</strong>: ${r.description?.substring(0,100) || ''}
+        </div>`;
+      });
+    } else if (s.key === 'P2_sessions') {
+      div.innerHTML += `<div class="text-xs text-slate-400 mb-2">${tier.count} active sessions for user</div>`;
+      (tier.sessions || []).forEach(s => {
+        div.innerHTML += `<div class="mem-entry border-blue-400 bg-blue-50 text-xs text-blue-800">
+          <strong>${s.session_id}</strong> · ${s.brand_id || 'no brand'} · ${s.market || 'no market'} · ${s.turn_count} turns
+        </div>`;
+      });
+      if (!tier.sessions?.length) div.innerHTML += `<div class="text-xs text-slate-500 italic">No active sessions</div>`;
+    } else if (s.key === 'P3_user_memory') {
+      div.innerHTML += `<div class="text-xs text-slate-400 mb-2">${tier.count} memories for user "${userId}"</div>`;
+      (tier.memories || []).forEach(m => {
+        div.innerHTML += `<div class="mem-entry border-purple-400 bg-purple-50 text-xs text-purple-800">
+          <span class="font-bold">[${m.category}]</span> ${m.key}: ${m.value}
+          <button onclick="deleteMemory('${m.id}')" class="float-right text-red-400 hover:text-red-600">×</button>
+        </div>`;
+      });
+      if (!tier.memories?.length) div.innerHTML += `<div class="text-xs text-slate-500 italic">No user memories yet. Say "My name is..." to create one.</div>`;
+    } else if (s.key === 'P3_brand_memory') {
+      const label = tier.brand ? `${tier.brand}${tier.market ? ' / ' + tier.market : ''}` : 'select a brand';
+      div.innerHTML += `<div class="text-xs text-slate-400 mb-2">${tier.count} memories for ${label}</div>`;
+      (tier.memories || []).forEach(m => {
+        div.innerHTML += `<div class="mem-entry border-purple-400 bg-purple-50 text-xs text-purple-800">
+          <span class="font-bold">[${m.category}]</span> ${m.key}: ${m.value.substring(0,120)}
+        </div>`;
+      });
+      if (!tier.memories?.length) div.innerHTML += `<div class="text-xs text-slate-500 italic">No brand memories. Select a brand and market above.</div>`;
+    } else if (s.key === 'P4_knowledge') {
+      div.innerHTML += `<div class="text-xs text-slate-400">${tier.total_chunks} total chunks indexed</div>`;
+      div.innerHTML += `<div class="text-xs text-green-400 mt-1">BM25 active: ${tier.bm25_active ? 'yes' : 'fallback mode'}</div>`;
+      Object.entries(tier.brands || {}).forEach(([brand, count]) => {
+        div.innerHTML += `<div class="mem-entry border-green-400 bg-green-50 text-xs text-green-800">
+          <strong>${brand}</strong>: ${count} chunks
+        </div>`;
+      });
+    } else if (s.key === 'P5_translation') {
+      div.innerHTML += `<div class="text-xs text-slate-400 mb-2">Languages: ${tier.languages?.join(', ')}</div>`;
+      Object.entries(tier.term_counts || {}).forEach(([lang, count]) => {
+        div.innerHTML += `<div class="mem-entry border-yellow-400 bg-yellow-50 text-xs text-yellow-800">
+          <strong>${lang}</strong>: ${count} approved translations
+        </div>`;
+      });
+    }
+
+    content.appendChild(div);
+  }
+}
+
+async function deleteMemory(id) {
+  await fetch(`${API}/memory/entry/${id}`, { method: 'DELETE' });
+  loadInspector();
+}
+
+// ── Documents tab ─────────────────────────────────────────────────────────────
+
+async function loadDocsStats() {
+  const res = await fetch(`${API}/knowledge/stats`);
+  const data = await res.json();
+  const el = document.getElementById('docs-stats');
+  el.innerHTML = `<div class="text-sm font-bold text-white mb-2">📚 Knowledge Base Status</div>
+    <div class="text-xs text-slate-400">Total chunks: <strong class="text-green-400">${data.total_chunks}</strong></div>
+    <div class="text-xs text-slate-400 mt-1">Brands loaded:</div>
+    ${Object.entries(data.brands || {}).map(([b,c]) => `<div class="text-xs text-green-400 ml-3">· ${b}: ${c} chunks</div>`).join('')}`;
+}
+
+async function addDocument() {
+  const brandId = document.getElementById('docBrandId').value;
+  const section = document.getElementById('docSection').value;
+  const text = document.getElementById('docText').value;
+  if (!text || !brandId) { alert('Brand ID and text required'); return; }
+  const params = new URLSearchParams({ brand_id: brandId, text, section, dataset: 'brand_knowledge' });
+  const res = await fetch(`${API}/documents/ingest-text?${params}`, { method: 'POST' });
+  const data = await res.json();
+  document.getElementById('docText').value = '';
+  loadDocsStats();
+  addSystemMessage(`Added "${section}" to ${brandId} knowledge base. Total chunks: ${data.total_chunks}`);
+}
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+
+function switchTab(tab) {
+  const tabs = ['chat', 'demos', 'inspector', 'docs'];
+  tabs.forEach(t => {
+    document.getElementById(`pane-${t}`).classList.toggle('hidden', t !== tab);
+    document.getElementById(`pane-${t}`).classList.toggle('flex', t === tab);
+    document.getElementById(`tab-${t}`).className = t === tab ? 'tab-active text-sm px-4 py-2 font-medium transition' : 'tab-inactive text-sm px-4 py-2 font-medium transition';
+  });
+  if (tab === 'demos') loadScenarios();
+  if (tab === 'inspector') loadInspector();
+  if (tab === 'docs') loadDocsStats();
+}
+
+function focusTier(tier) {
+  switchTab('inspector');
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+async function init() {
+  // Load health stats for sidebar
+  try {
+    const res = await fetch(`${API}/health`);
+    const data = await res.json();
+    document.getElementById('p4-status').textContent = `${data.knowledge_chunks} chunks, ${data.brands_loaded?.length || 0} brands`;
+    document.getElementById('dot-p4').className = 'tier-dot dot-on';
+    document.getElementById('badge-p4').textContent = 'READY';
+    document.getElementById('badge-p4').className = 'pill pill-p4 text-xs';
+
+    const tmRes = await fetch(`${API}/memory/translation/entries`);
+    const tmData = await tmRes.json();
+    const totalTM = Object.values(tmData).reduce((a, v) => a + v.length, 0);
+    document.getElementById('p5-status').textContent = `${totalTM} terms in ${Object.keys(tmData).length} languages`;
+    document.getElementById('dot-p5').className = 'tier-dot dot-on';
+    document.getElementById('badge-p5').textContent = 'READY';
+    document.getElementById('badge-p5').className = 'pill pill-p5 text-xs';
+  } catch (e) {
+    document.getElementById('p4-status').textContent = 'Backend not running';
+    document.getElementById('p5-status').textContent = 'Backend not running';
+  }
+}
+
+init();
+</script>
+</body>
+</html>

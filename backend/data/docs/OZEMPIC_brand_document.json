@@ -1,0 +1,205 @@
+{
+  "brand_document_id": "OZEMPIC-001",
+  "data_source": "openFDA API - api.fda.gov/drug/label.json",
+  "source_last_updated": "2026-06-09",
+  "recent_label_changes": [
+    "Indications and Usage (1) — 10/2025",
+    "Dosage and Administration (2) — 12/2025",
+    "Warnings: Acute Pancreatitis (5.2) — 10/2025",
+    "Warnings: Acute Kidney Injury Due to Volume Depletion (5.5) — 10/2025",
+    "Warnings: Severe Gastrointestinal Adverse Reactions (5.6) — 10/2025",
+    "Warnings: Acute Gallbladder Disease (5.8) — 10/2025"
+  ],
+
+  "brand_metadata": {
+    "brand_name": "OZEMPIC",
+    "generic_name": "semaglutide",
+    "also_marketed_as": "RYBELSUS (oral tablet formulation — same molecule)",
+    "manufacturer": "Novo Nordisk Inc.",
+    "drug_class": "GLP-1 receptor agonist",
+    "therapeutic_area": "Type 2 Diabetes / Cardiovascular Risk Reduction",
+    "route_of_administration": ["subcutaneous injection", "oral tablet"],
+    "approval_status": "FDA-approved",
+    "ndc_available": true
+  },
+
+  "indications": {
+    "approved_indications": [
+      {
+        "indication_id": "IND-001",
+        "indication_text": "Adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus.",
+        "population": "Adults with type 2 diabetes mellitus",
+        "regulatory_basis": "Section 1, FDA-approved label"
+      },
+      {
+        "indication_id": "IND-002",
+        "indication_text": "To reduce the risk of major adverse cardiovascular events (CV death, non-fatal myocardial infarction, or non-fatal stroke) in adults with type 2 diabetes mellitus who are at high risk for these events.",
+        "population": "Adults with T2DM at high cardiovascular risk",
+        "regulatory_basis": "Section 1, FDA-approved label"
+      }
+    ],
+    "not_approved_for": [
+      "Pediatric patients (safety and effectiveness not established)",
+      "Weight management as primary indication (see Wegovy for that indication)",
+      "Type 1 diabetes mellitus"
+    ]
+  },
+
+  "mechanism_of_action": {
+    "moa_summary": "Semaglutide is a GLP-1 receptor agonist with 94% sequence homology to human GLP-1. It selectively binds and activates the GLP-1 receptor.",
+    "key_mechanisms": [
+      "Stimulates glucose-dependent insulin secretion",
+      "Lowers glucose-dependent glucagon secretion",
+      "Minor delay in early postprandial gastric emptying",
+      "Long half-life (~1 week) via albumin binding — reduces renal clearance and protects against DPP-4 degradation"
+    ],
+    "source_section": "12.1 Mechanism of Action"
+  },
+
+  "approved_claims": [
+    {
+      "claim_id": "CLM-001",
+      "claim_text": "OZEMPIC (semaglutide) 14 mg reduced HbA1c by 1.4% from baseline vs. -0.3% for placebo in a 26-week monotherapy trial.",
+      "claim_type": "Efficacy — Glycemic Control",
+      "supporting_data": "Trial 1 (NCT02906930), N=175 (semaglutide 14mg) vs N=178 (placebo), 26-week double-blind trial",
+      "statistical_significance": "p<0.001",
+      "source_section": "14.2 Clinical Studies"
+    },
+    {
+      "claim_id": "CLM-002",
+      "claim_text": "77% of patients treated with OZEMPIC 14 mg achieved HbA1c < 7% in a 26-week monotherapy trial vs. 31% on placebo.",
+      "claim_type": "Efficacy — Glycemic Target Achievement",
+      "supporting_data": "Trial 1 (NCT02906930)",
+      "source_section": "14.2 Clinical Studies"
+    },
+    {
+      "claim_id": "CLM-003",
+      "claim_text": "OZEMPIC 14 mg demonstrated superior HbA1c reduction (-1.3%) vs. empagliflozin 25 mg (-0.9%) in patients on background metformin.",
+      "claim_type": "Efficacy — Head-to-Head vs. Comparator",
+      "supporting_data": "Trial 2 (NCT02863328), N=411 vs N=410, 26-week trial",
+      "statistical_significance": "Difference -0.4% [95% CI: -0.6, -0.3], p<0.001",
+      "source_section": "14.3 Clinical Studies"
+    },
+    {
+      "claim_id": "CLM-004",
+      "claim_text": "OZEMPIC reduced the risk of major adverse cardiovascular events (MACE) in adults with type 2 diabetes at high CV risk.",
+      "claim_type": "Efficacy — Cardiovascular Outcomes",
+      "supporting_data": "4-year CV outcomes trial (Trial 7), N=4,825 semaglutide vs N=4,825 placebo",
+      "source_section": "1 Indications, 14.4 Clinical Studies"
+    },
+    {
+      "claim_id": "CLM-005",
+      "claim_text": "OZEMPIC 14 mg demonstrated non-inferior HbA1c reduction vs. liraglutide 1.8 mg subcutaneous injection.",
+      "claim_type": "Efficacy — Non-inferiority vs. Comparator",
+      "supporting_data": "Trial 4 (NCT02863419), difference -0.1% [95% CI: -0.3, 0]",
+      "source_section": "14.3 Clinical Studies"
+    },
+    {
+      "claim_id": "CLM-006",
+      "claim_text": "OZEMPIC 14 mg produced mean body weight reduction of 3.7 kg from baseline at 26 weeks in monotherapy use.",
+      "claim_type": "Efficacy — Body Weight",
+      "supporting_data": "Trial 1, mean baseline weight 88.1 kg, difference from placebo -2.3 kg [-3.1, -1.5]",
+      "source_section": "14.2 Clinical Studies"
+    }
+  ],
+
+  "contraindications": [
+    {
+      "contraindication_id": "CI-001",
+      "text": "Personal or family history of medullary thyroid carcinoma (MTC) or Multiple Endocrine Neoplasia syndrome type 2 (MEN 2).",
+      "source_section": "4 Contraindications"
+    },
+    {
+      "contraindication_id": "CI-002",
+      "text": "Prior serious hypersensitivity reaction to semaglutide or any excipients in OZEMPIC/RYBELSUS tablets.",
+      "source_section": "4 Contraindications"
+    }
+  ],
+
+  "boxed_warning": {
+    "warning_title": "RISK OF THYROID C-CELL TUMORS",
+    "warning_summary": "In rodents, semaglutide causes dose-dependent thyroid C-cell tumors at clinically relevant exposures. Human relevance is unknown. Contraindicated in patients with personal/family history of MTC or MEN 2.",
+    "source_section": "Boxed Warning"
+  },
+
+  "key_warnings": [
+    "Acute Pancreatitis — observe for signs/symptoms; discontinue if suspected",
+    "Diabetic Retinopathy Complications — monitor patients with history of diabetic retinopathy",
+    "Hypoglycemia with insulin secretagogues or insulin — dose reduction may be required",
+    "Acute Kidney Injury Due to Volume Depletion — monitor renal function",
+    "Severe Gastrointestinal Adverse Reactions — NOT recommended in patients with severe gastroparesis",
+    "Hypersensitivity Reactions — anaphylaxis and angioedema reported",
+    "Acute Gallbladder Disease — gallbladder studies indicated if cholelithiasis or cholecystitis suspected",
+    "Pulmonary Aspiration During General Anesthesia — delayed gastric emptying; instruct patients to inform HCPs before surgeries"
+  ],
+
+  "adverse_reactions": {
+    "most_common_gte_5pct": ["nausea", "abdominal pain", "diarrhea", "decreased appetite", "vomiting", "constipation"],
+    "incidence_data": {
+      "nausea": {"placebo": "6%", "semaglutide_7mg": "11%", "semaglutide_14mg": "20%"},
+      "abdominal_pain": {"placebo": "4%", "semaglutide_7mg": "10%", "semaglutide_14mg": "11%"},
+      "diarrhea": {"placebo": "4%", "semaglutide_7mg": "9%", "semaglutide_14mg": "10%"},
+      "decreased_appetite": {"placebo": "1%", "semaglutide_7mg": "6%", "semaglutide_14mg": "9%"},
+      "vomiting": {"placebo": "3%", "semaglutide_7mg": "6%", "semaglutide_14mg": "8%"},
+      "constipation": {"placebo": "2%", "semaglutide_7mg": "6%", "semaglutide_14mg": "5%"}
+    },
+    "gi_discontinuation_rate": {
+      "semaglutide_14mg": "8%",
+      "semaglutide_7mg": "4%",
+      "placebo": "1%"
+    },
+    "postmarketing_notable": [
+      "Acute/necrotizing pancreatitis (sometimes fatal)",
+      "Ileus and intestinal obstruction",
+      "Anaphylaxis and angioedema",
+      "Cholecystitis requiring cholecystectomy",
+      "Acute kidney injury",
+      "Alopecia",
+      "Pulmonary aspiration during procedures"
+    ],
+    "source_section": "6 Adverse Reactions"
+  },
+
+  "dosing": {
+    "ozempic_tablets": {
+      "starting": "1.5 mg orally once daily for 30 days (not effective for glycemic control at this dose)",
+      "escalation": "Days 31-60: increase to 4 mg once daily",
+      "maintenance": "4 mg or 9 mg once daily",
+      "administration": "Once daily on empty stomach, morning, with up to 4 oz water only. Wait 30 min before eating/drinking. Swallow whole."
+    },
+    "rybelsus_tablets": {
+      "starting": "3 mg orally once daily for 30 days",
+      "escalation": "Days 31-60: increase to 7 mg once daily",
+      "maintenance": "7 mg or 14 mg once daily"
+    },
+    "note": "RYBELSUS and OZEMPIC tablets are NOT substitutable on a mg-to-mg basis.",
+    "source_section": "2 Dosage and Administration"
+  },
+
+  "drug_interactions": {
+    "key_interactions": [
+      "Insulin secretagogues (sulfonylureas) or insulin — increased hypoglycemia risk; dose reduction may be needed",
+      "Levothyroxine — total thyroxine AUC increased 33% with concomitant use; monitor",
+      "Narrow therapeutic index drugs — gastric emptying delay; consider increased monitoring"
+    ],
+    "source_section": "7 Drug Interactions"
+  },
+
+  "marketing_content_rules": {
+    "mandatory_references": [
+      "All efficacy claims must reference specific clinical trial data (trial number, population, duration)",
+      "CV outcomes claim requires citing 4-year cardiovascular outcomes trial context",
+      "Body weight change must note it is not an approved weight management indication"
+    ],
+    "prohibited_claims": [
+      "Do NOT claim efficacy in pediatric patients — not established",
+      "Do NOT compare head-to-head to WEGOVY (different product/indication) without clear differentiation",
+      "Do NOT minimize or omit the boxed warning for thyroid C-cell tumor risk in any promotional materials"
+    ],
+    "required_fair_balance": [
+      "Thyroid C-cell tumor risk (boxed warning)",
+      "GI adverse reactions profile (nausea up to 20%)",
+      "Contraindications (MTC/MEN2 history)"
+    ]
+  }
+}
