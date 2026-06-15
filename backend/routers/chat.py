@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi import APIRouter
 from models import ChatRequest, ChatResponse
 from services import p2_session, p3_episodic, p4_knowledge, p5_translation
+from services.p3_episodic import _detect_brand_market
 import context_assembler
 from openai import OpenAI
 from config import settings
@@ -16,25 +17,30 @@ _llm = OpenAI(
 
 @router.post("", response_model=ChatResponse)
 async def chat(req: ChatRequest):
-    # Ensure session exists
+    # Infer brand/market from message text when dropdown is not set
+    detected_brand, detected_market = _detect_brand_market(req.message)
+    effective_brand = req.brand_id or detected_brand
+    effective_market = req.market or detected_market
+
+    # Ensure session exists; update P2 with effective brand/market (inferred or explicit)
     session = p2_session.get_session(req.session_id)
     if not session:
-        req.session_id = p2_session.create_session(req.user_id, req.brand_id, req.market)
+        req.session_id = p2_session.create_session(req.user_id, effective_brand, effective_market)
     else:
-        p2_session.update_context(req.session_id, req.brand_id, req.market)
+        p2_session.update_context(req.session_id, effective_brand, effective_market)
 
     # Extract & store any facts from this message (P3 write path)
     stored_facts = p3_episodic.extract_and_store_facts(
-        req.message, req.user_id, req.brand_id, req.market, _llm
+        req.message, req.user_id, effective_brand, effective_market, _llm
     )
 
-    # Assemble context from all 5 tiers
+    # Assemble context from all 5 tiers using effective brand/market
     system_prompt, memory_trace, is_blocked = context_assembler.assemble(
         message=req.message,
         session_id=req.session_id,
         user_id=req.user_id,
-        brand_id=req.brand_id,
-        market=req.market,
+        brand_id=effective_brand,
+        market=effective_market,
         target_language=req.target_language,
     )
 

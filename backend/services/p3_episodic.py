@@ -28,12 +28,28 @@ _conn: sqlite3.Connection | None = None
 
 KNOWN_BRANDS = {"OZEMPIC", "KEYTRUDA", "HUMIRA"}
 _MARKET_ALIASES = {
-    "US": ["US", "UNITED STATES", "USA", "AMERICA"],
-    "DE": ["GERMANY", "GERMAN", " DE ", "DEUTSCH"],
-    "IN": ["INDIA", "INDIAN", " IN "],
-    "JP": ["JAPAN", "JAPANESE", " JP "],
-    "EU": ["EUROPE", "EUROPEAN", " EU "],
+    "US": ["UNITED STATES", "USA", "AMERICA", " US "],
+    "DE": ["GERMANY", "GERMAN", "DEUTSCH"],
+    "IN": ["INDIA", "INDIAN"],
+    "JP": ["JAPAN", "JAPANESE"],
+    "EU": ["EUROPE", "EUROPEAN"],
 }
+
+# Signals that a message is asserting facts (not just asking)
+_STATEMENT_SIGNALS = (
+    "my name is", "i am ", "i'm ", "call me", "i work", "my role",
+    "my title", "my company", "my organization", "i prefer", "i like ",
+    "please use", "use formal", "use bullet", "for this session",
+    "mlr rejected", "mlr approved", "rejected phrase", "approved phrase",
+    "do not use", "never use", "always use", "flag this",
+    "my preference", "i moved", "i joined", "i left",
+)
+
+# Values that indicate the LLM extracted a question-echo or unknown
+_BAD_VALUE_FRAGMENTS = (
+    "unknown", "not specified", "not mentioned", "not provided",
+    "not applicable", "n/a", "none", "?",
+)
 
 
 def _detect_brand_market(message: str) -> tuple:
@@ -46,6 +62,27 @@ def _detect_brand_market(message: str) -> tuple:
             market = mkt
             break
     return brand, market
+
+
+def _is_statement(message: str) -> bool:
+    """True if message contains an assertable fact, not just a question."""
+    lower = message.lower()
+    if any(s in lower for s in _STATEMENT_SIGNALS):
+        return True
+    # Message with no question mark is likely a statement or command
+    if "?" not in message:
+        return True
+    # Has a question mark BUT also has statement content before it
+    parts = message.split("?")
+    return any(any(s in p.lower() for s in _STATEMENT_SIGNALS) for p in parts[:-1])
+
+
+def _is_bad_value(value: str) -> bool:
+    """True if extracted value is garbage (question echo, unknown, too short)."""
+    v = value.strip().lower()
+    if len(v) < 3:
+        return True
+    return any(bad in v for bad in _BAD_VALUE_FRAGMENTS)
 
 
 def init(data_dir: Path) -> None:
@@ -215,7 +252,11 @@ def retrieve(user_id: str, brand_id: str | None, market: str | None, query: str)
 
 
 def extract_and_store_facts(message: str, user_id: str, brand_id: str | None, market: str | None, llm_client) -> list[dict]:
-    """Use LLM to extract storable facts from user message."""
+    """Use LLM to extract storable facts from user message. Skips pure questions."""
+    # Fast-path: don't extract from pure questions — they contain no assertable facts
+    if not _is_statement(message):
+        return []
+
     # Auto-detect brand/market from message text when not explicitly selected
     detected_brand, detected_market = _detect_brand_market(message)
     effective_brand = brand_id or detected_brand
@@ -224,31 +265,32 @@ def extract_and_store_facts(message: str, user_id: str, brand_id: str | None, ma
     brand_context = f"Brand in context: {effective_brand}" if effective_brand else "No specific brand selected"
     market_context = f"Market in context: {effective_market}" if effective_market else "No specific market"
 
-    prompt = f"""You are a memory extraction system for a pharma AI platform. Extract facts worth remembering persistently from this user message.
+    prompt = f"""You are a memory extraction system for a pharma AI platform. Extract ONLY explicitly stated facts from this user message worth storing persistently.
 
 {brand_context}
 {market_context}
 User message: "{message}"
 
-Extract facts in these categories (only clear, explicit statements — not assumptions):
-- user_fact: facts about the user (name, role, organization)
-- user_preference: preferences (tone, format, language, style)
-- mlr_feedback: MLR/regulatory decisions — rejected phrases, approved phrases, flagged content
-- market_rule: market-specific rules or guidelines for a brand
-- brand_fact: factual information about a specific drug/brand
+RULES:
+- Only extract clear first-person assertions: "My name is X", "I work at Y", "MLR rejected Z"
+- NEVER extract from questions or rhetorical phrases — "What is my name?" contains no storable fact
+- NEVER set a value to "unknown", "not specified", or anything that repeats question phrasing
+- If message is a question with no assertion, return {{"facts": []}}
 
-For mlr_feedback and market_rule, set scope to "brand_market" if a market is mentioned, else "brand".
-Use the brand from context if the message doesn't name one explicitly.
+Categories:
+- user_fact: name, role, organization of the user
+- user_preference: tone, format, language preferences
+- mlr_feedback: MLR decisions — rejected/approved phrases (scope: brand_market if market known, else brand)
+- market_rule: market-specific rules for a brand (same scope rule)
+- brand_fact: factual claims about a specific drug/brand
 
-Return JSON only:
+Return JSON only — example:
 {{
   "facts": [
-    {{"category": "mlr_feedback", "key": "rejected_phrase_significantly_reduces", "value": "MLR rejected 'significantly reduces' — use 'reduces' instead", "scope": "brand_market"}},
+    {{"category": "mlr_feedback", "key": "rejected_phrase_rapidly", "value": "MLR rejected 'rapidly acting' for KEYTRUDA US — use 'demonstrated rapid response'", "scope": "brand_market"}},
     {{"category": "user_fact", "key": "user_name", "value": "Apurva", "scope": "user"}}
   ]
-}}
-
-Return {{"facts": []}} if nothing worth remembering persistently."""
+}}"""
 
     try:
         response = llm_client.chat.completions.create(
@@ -259,19 +301,23 @@ Return {{"facts": []}} if nothing worth remembering persistently."""
         text = response.choices[0].message.content.strip()
         start_idx = text.find("{")
         end_idx = text.rfind("}") + 1
-        if start_idx >= 0:
-            data = json.loads(text[start_idx:end_idx])
-            facts = data.get("facts", [])
-            stored = []
-            for f in facts:
-                if f.get("scope") == "user":
-                    mid = add_user_memory(user_id, f["key"], f["value"], f["category"])
-                    stored.append({**f, "id": mid, "stored": True})
-                elif f.get("scope") in ("brand", "brand_market") and effective_brand:
-                    use_market = effective_market if f["scope"] == "brand_market" else None
-                    mid = add_brand_memory(effective_brand, f["key"], f["value"], use_market, f["category"])
-                    stored.append({**f, "id": mid, "stored": True, "brand": effective_brand, "market": use_market})
-            return stored
+        if start_idx < 0:
+            return []
+        data = json.loads(text[start_idx:end_idx])
+        facts = data.get("facts", [])
+        stored = []
+        for f in facts:
+            value = f.get("value", "")
+            if _is_bad_value(value):
+                continue  # drop garbage extractions
+            if f.get("scope") == "user":
+                mid = add_user_memory(user_id, f["key"], value, f["category"])
+                stored.append({**f, "id": mid, "stored": True})
+            elif f.get("scope") in ("brand", "brand_market") and effective_brand:
+                use_market = effective_market if f["scope"] == "brand_market" else None
+                mid = add_brand_memory(effective_brand, f["key"], value, use_market, f["category"])
+                stored.append({**f, "id": mid, "stored": True, "brand": effective_brand, "market": use_market})
+        return stored
     except Exception:
         pass
     return []
