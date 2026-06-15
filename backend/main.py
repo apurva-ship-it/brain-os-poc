@@ -15,9 +15,14 @@ from services import p1_guardrails, p3_episodic, p4_knowledge, p5_translation
 from routers import chat, memory, documents
 
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
+_initialized = False
 
 
 def _init_services():
+    global _initialized
+    if _initialized:
+        return
+    _initialized = True
     data_dir = settings.data_dir
     p1_guardrails.load_brand_rules(data_dir)
     chunk_count = p4_knowledge.load_brand_documents(data_dir)
@@ -27,9 +32,13 @@ def _init_services():
     print(f"Brain OS ready — P4: {chunk_count} chunks, P5: {tm_count} TM entries ✓")
 
 
+# Run at module load time so Vercel serverless cold starts initialize correctly
+_init_services()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    _init_services()
+    _init_services()  # no-op after first call
     yield
 
 
