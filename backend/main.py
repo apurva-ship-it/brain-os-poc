@@ -14,7 +14,9 @@ from config import settings
 from services import p1_guardrails, p3_episodic, p4_knowledge, p5_translation
 from routers import chat, memory, documents
 
-FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
+# Use os.path.abspath so this works on Vercel even when __file__ may be relative
+_BACKEND_DIR = Path(os.path.abspath(__file__)).parent
+FRONTEND_DIR = _BACKEND_DIR.parent / "frontend"
 _initialized = False
 
 
@@ -23,7 +25,8 @@ def _init_services():
     if _initialized:
         return
     _initialized = True
-    data_dir = settings.data_dir
+    # Derive data_dir from main.py location — more reliable than config.py __file__ on Vercel
+    data_dir = _BACKEND_DIR / "data"
     p1_guardrails.load_brand_rules(data_dir)
     chunk_count = p4_knowledge.load_brand_documents(data_dir)
     tm_count = p5_translation.load(data_dir)
@@ -74,14 +77,14 @@ async def root():
 
 @app.get("/debug/paths")
 async def debug_paths():
-    data_dir = settings.data_dir
+    data_dir = _BACKEND_DIR / "data"
     docs_dir = data_dir / "docs"
-    import os
     return {
         "cwd": os.getcwd(),
         "main_file": __file__,
+        "backend_dir": str(_BACKEND_DIR),
+        "settings_data_dir": str(settings.data_dir),
         "data_dir": str(data_dir),
-        "docs_dir": str(docs_dir),
         "docs_exists": docs_dir.exists(),
         "data_exists": data_dir.exists(),
         "data_contents": [str(p) for p in data_dir.iterdir()] if data_dir.exists() else [],
