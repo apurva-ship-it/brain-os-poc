@@ -72,6 +72,23 @@ async def root():
     return {"message": "Brain OS POC API", "docs": "/docs"}
 
 
+@app.get("/debug/paths")
+async def debug_paths():
+    data_dir = settings.data_dir
+    docs_dir = data_dir / "docs"
+    import os
+    return {
+        "cwd": os.getcwd(),
+        "main_file": __file__,
+        "data_dir": str(data_dir),
+        "docs_dir": str(docs_dir),
+        "docs_exists": docs_dir.exists(),
+        "data_exists": data_dir.exists(),
+        "data_contents": [str(p) for p in data_dir.iterdir()] if data_dir.exists() else [],
+        "docs_contents": [p.name for p in docs_dir.iterdir()] if docs_dir.exists() else [],
+    }
+
+
 @app.get("/health")
 async def health():
     stats = p4_knowledge.get_stats()
