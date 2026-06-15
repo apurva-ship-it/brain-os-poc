@@ -4,11 +4,14 @@ from fastapi import APIRouter
 from models import ChatRequest, ChatResponse
 from services import p2_session, p3_episodic, p4_knowledge, p5_translation
 import context_assembler
-import anthropic
+from openai import OpenAI
 from config import settings
 
 router = APIRouter(prefix="/chat", tags=["chat"])
-_llm = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+_llm = OpenAI(
+    api_key=settings.openrouter_api_key,
+    base_url="https://openrouter.ai/api/v1",
+)
 
 
 @router.post("", response_model=ChatResponse)
@@ -57,13 +60,12 @@ async def chat(req: ChatRequest):
     messages = turns[-6:] + [{"role": "user", "content": req.message}]
 
     # Call LLM
-    response = _llm.messages.create(
+    response = _llm.chat.completions.create(
         model=settings.llm_model,
         max_tokens=settings.max_tokens,
-        system=system_prompt,
-        messages=messages,
+        messages=[{"role": "system", "content": system_prompt}] + messages,
     )
-    answer = response.content[0].text
+    answer = response.choices[0].message.content
 
     # Store turns in P2 session memory
     p2_session.add_turn(req.session_id, "user", req.message)

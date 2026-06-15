@@ -7,8 +7,8 @@ _DEFAULT_DATA_DIR = _BACKEND_DIR / "data"
 
 
 class Settings(BaseSettings):
-    anthropic_api_key: str
-    llm_model: str = "claude-haiku-4-5-20251001"
+    openrouter_api_key: str
+    llm_model: str = "anthropic/claude-3-haiku"
     max_tokens: int = 1024
     session_ttl_seconds: int = 1800
     data_dir: Path = _DEFAULT_DATA_DIR

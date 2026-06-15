@@ -213,12 +213,12 @@ Return {{"facts": []}} if nothing worth remembering persistently.
 Only extract clear, explicit statements — not assumptions."""
 
     try:
-        response = llm_client.messages.create(
-            model="claude-haiku-4-5-20251001",
+        response = llm_client.chat.completions.create(
+            model="anthropic/claude-3-haiku",
             max_tokens=400,
             messages=[{"role": "user", "content": prompt}],
         )
-        text = response.content[0].text.strip()
+        text = response.choices[0].message.content.strip()
         # Parse JSON
         start_idx = text.find("{")
         end_idx = text.rfind("}") + 1
