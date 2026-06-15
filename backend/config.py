@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 from pathlib import Path
 
 # Absolute path — works both locally (python main.py) and on Vercel serverless
-_BACKEND_DIR = Path(__file__).parent
+_BACKEND_DIR = Path(__file__).resolve().parent
 _DEFAULT_DATA_DIR = _BACKEND_DIR / "data"
 
 
