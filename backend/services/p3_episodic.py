@@ -35,14 +35,21 @@ _MARKET_ALIASES = {
     "EU": ["EUROPE", "EUROPEAN"],
 }
 
-# Signals that a message is asserting facts (not just asking)
+# Signals that a message is asserting facts (not just asking).
+# Keep these specific enough to avoid matching question subjects
+# ("where do i work" must NOT match — use "i work at/as/for" not "i work")
 _STATEMENT_SIGNALS = (
-    "my name is", "i am ", "i'm ", "call me", "i work", "my role",
-    "my title", "my company", "my organization", "i prefer", "i like ",
-    "please use", "use formal", "use bullet", "for this session",
-    "mlr rejected", "mlr approved", "rejected phrase", "approved phrase",
-    "do not use", "never use", "always use", "flag this",
-    "my preference", "i moved", "i joined", "i left",
+    "my name is", "call me ",
+    "i am a ", "i'm a ", "i am the ", "i'm the ",
+    "i work at", "i work as", "i work for", "i now work", "i currently work",
+    "i moved to", "i joined ", "i left ",
+    "my role is", "my title is", "my company is", "my organization is",
+    "i prefer ", "i like to ", "please use ", "use formal", "use bullet",
+    "for this session", "my preference is",
+    "mlr rejected", "mlr approved", "mlr flagged",
+    "rejected phrase", "approved phrase", "rejected the phrase",
+    "do not use", "never use ", "always use ",
+    "flag this", "note this", "remember this",
 )
 
 # Values that indicate the LLM extracted a question-echo or unknown
