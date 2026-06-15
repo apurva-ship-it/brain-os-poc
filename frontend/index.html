@@ -646,6 +646,7 @@ function renderModalSteps() {
         ${step.message !== 'CREATE_NEW_SESSION'
           ? `<div class="text-xs font-mono bg-slate-900 rounded px-2 py-1 text-green-300">"${step.message}"</div>`
           : `<div class="text-xs font-mono bg-slate-900 rounded px-2 py-1 text-blue-300">🔄 Create New Session</div>`}
+        ${(step.brand || step.market) ? `<div class="mt-1 flex gap-1">${step.brand ? `<span class="text-xs bg-purple-900 text-purple-300 rounded px-1.5 py-0.5">Brand: ${step.brand}</span>` : ''}${step.market ? `<span class="text-xs bg-blue-900 text-blue-300 rounded px-1.5 py-0.5">Market: ${step.market}</span>` : ''}<span class="text-xs text-slate-500 italic">auto-set</span></div>` : ''}
       </div>
     </div>`;
     container.appendChild(div);
@@ -658,6 +659,14 @@ async function nextStep() {
   const step = currentScenario.steps[currentStep];
   closeModal();
   switchTab('chat');
+
+  // Auto-set brand/market dropdowns if the step specifies them
+  if (step.brand !== undefined) {
+    document.getElementById('brandSelect').value = step.brand || '';
+  }
+  if (step.market !== undefined) {
+    document.getElementById('marketSelect').value = step.market || '';
+  }
 
   if (step.message === 'CREATE_NEW_SESSION') {
     await newSession();

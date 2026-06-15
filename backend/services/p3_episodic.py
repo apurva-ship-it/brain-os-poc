@@ -26,6 +26,27 @@ from models import TierResult
 _DB_PATH: Path | None = None
 _conn: sqlite3.Connection | None = None
 
+KNOWN_BRANDS = {"OZEMPIC", "KEYTRUDA", "HUMIRA"}
+_MARKET_ALIASES = {
+    "US": ["US", "UNITED STATES", "USA", "AMERICA"],
+    "DE": ["GERMANY", "GERMAN", " DE ", "DEUTSCH"],
+    "IN": ["INDIA", "INDIAN", " IN "],
+    "JP": ["JAPAN", "JAPANESE", " JP "],
+    "EU": ["EUROPE", "EUROPEAN", " EU "],
+}
+
+
+def _detect_brand_market(message: str) -> tuple:
+    """Return (brand_id, market) detected from free text, or (None, None)."""
+    msg = " " + message.upper() + " "
+    brand = next((b for b in KNOWN_BRANDS if b in msg), None)
+    market = None
+    for mkt, aliases in _MARKET_ALIASES.items():
+        if any(a in msg for a in aliases):
+            market = mkt
+            break
+    return brand, market
+
 
 def init(data_dir: Path) -> None:
     import os
@@ -144,6 +165,11 @@ def retrieve(user_id: str, brand_id: str | None, market: str | None, query: str)
     start = time.monotonic()
     contributions = []
 
+    # Auto-detect brand/market from query when not explicitly set
+    detected_brand, detected_market = _detect_brand_market(query)
+    effective_brand = brand_id or detected_brand
+    effective_market = market or detected_market
+
     # 1. User memories (cross-session)
     user_mems = get_user_memories(user_id)
     if user_mems:
@@ -157,15 +183,15 @@ def retrieve(user_id: str, brand_id: str | None, market: str | None, query: str)
             })
 
     # 2. Brand memories
-    if brand_id:
-        brand_mems = get_brand_memories(brand_id, market)
+    if effective_brand:
+        brand_mems = get_brand_memories(effective_brand, effective_market)
         for m in brand_mems[:5]:
             contributions.append({
                 "type": "brand_memory" if m["scope"] == "brand" else "market_memory",
                 "key": m["key"],
                 "value": m["value"],
                 "category": m["category"],
-                "scope": f"{brand_id}" + (f" / {market}" if market and m["scope"] == "brand_market" else ""),
+                "scope": f"{effective_brand}" + (f" / {effective_market}" if effective_market and m["scope"] == "brand_market" else ""),
             })
 
     if not contributions:
@@ -190,36 +216,47 @@ def retrieve(user_id: str, brand_id: str | None, market: str | None, query: str)
 
 def extract_and_store_facts(message: str, user_id: str, brand_id: str | None, market: str | None, llm_client) -> list[dict]:
     """Use LLM to extract storable facts from user message."""
-    prompt = f"""You are a memory extraction system. Analyze this user message and extract any facts worth remembering persistently.
+    # Auto-detect brand/market from message text when not explicitly selected
+    detected_brand, detected_market = _detect_brand_market(message)
+    effective_brand = brand_id or detected_brand
+    effective_market = market or detected_market
 
+    brand_context = f"Brand in context: {effective_brand}" if effective_brand else "No specific brand selected"
+    market_context = f"Market in context: {effective_market}" if effective_market else "No specific market"
+
+    prompt = f"""You are a memory extraction system for a pharma AI platform. Extract facts worth remembering persistently from this user message.
+
+{brand_context}
+{market_context}
 User message: "{message}"
 
-Extract facts in these categories:
+Extract facts in these categories (only clear, explicit statements — not assumptions):
 - user_fact: facts about the user (name, role, organization)
-- user_preference: preferences (tone, format, style, language)
-- brand_fact: facts about a specific drug/brand (if brand context present)
-- mlr_feedback: MLR decisions, rejected/approved phrases
-- market_rule: market-specific rules or guidelines
+- user_preference: preferences (tone, format, language, style)
+- mlr_feedback: MLR/regulatory decisions — rejected phrases, approved phrases, flagged content
+- market_rule: market-specific rules or guidelines for a brand
+- brand_fact: factual information about a specific drug/brand
+
+For mlr_feedback and market_rule, set scope to "brand_market" if a market is mentioned, else "brand".
+Use the brand from context if the message doesn't name one explicitly.
 
 Return JSON only:
 {{
   "facts": [
-    {{"category": "user_fact", "key": "user_name", "value": "Apurva", "scope": "user"}},
-    {{"category": "user_preference", "key": "response_format", "value": "bullet points", "scope": "user"}}
+    {{"category": "mlr_feedback", "key": "rejected_phrase_significantly_reduces", "value": "MLR rejected 'significantly reduces' — use 'reduces' instead", "scope": "brand_market"}},
+    {{"category": "user_fact", "key": "user_name", "value": "Apurva", "scope": "user"}}
   ]
 }}
 
-Return {{"facts": []}} if nothing worth remembering persistently.
-Only extract clear, explicit statements — not assumptions."""
+Return {{"facts": []}} if nothing worth remembering persistently."""
 
     try:
         response = llm_client.chat.completions.create(
             model="anthropic/claude-3-haiku",
-            max_tokens=400,
+            max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
         text = response.choices[0].message.content.strip()
-        # Parse JSON
         start_idx = text.find("{")
         end_idx = text.rfind("}") + 1
         if start_idx >= 0:
@@ -230,9 +267,10 @@ Only extract clear, explicit statements — not assumptions."""
                 if f.get("scope") == "user":
                     mid = add_user_memory(user_id, f["key"], f["value"], f["category"])
                     stored.append({**f, "id": mid, "stored": True})
-                elif f.get("scope") in ("brand", "brand_market") and brand_id:
-                    mid = add_brand_memory(brand_id, f["key"], f["value"], market if f["scope"] == "brand_market" else None, f["category"])
-                    stored.append({**f, "id": mid, "stored": True})
+                elif f.get("scope") in ("brand", "brand_market") and effective_brand:
+                    use_market = effective_market if f["scope"] == "brand_market" else None
+                    mid = add_brand_memory(effective_brand, f["key"], f["value"], use_market, f["category"])
+                    stored.append({**f, "id": mid, "stored": True, "brand": effective_brand, "market": use_market})
             return stored
     except Exception:
         pass

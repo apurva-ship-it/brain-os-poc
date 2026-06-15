@@ -152,9 +152,10 @@ async def demo_scenarios():
                 "color": "purple",
                 "icon": "🏥",
                 "steps": [
-                    {"message": "What are the marketing rules for HUMIRA in the US?", "instruction": "Step 1: Ask about HUMIRA US rules. P3 has market-specific episodic memory pre-loaded."},
-                    {"message": "Are there any rejected phrases I should know about for OZEMPIC?", "instruction": "Step 2: Ask about MLR rejections. P3 surfaces governance feedback memory."},
-                    {"message": "What should I know about HUMIRA for the Germany market?", "instruction": "Step 3: Germany-specific memory — different from US rules."},
+                    {"message": "MLR rejected the phrase 'significantly reduces blood sugar' for OZEMPIC US last week. Use 'reduces' only.", "instruction": "Step 1: Report an MLR decision. Brand=OZEMPIC, Market=US auto-selected. This gets stored in P3 brand memory.", "brand": "OZEMPIC", "market": "US"},
+                    {"message": "Are there any rejected phrases I should know about for OZEMPIC?", "instruction": "Step 2: Ask what MLR feedback is stored. P3 returns the rule you just told it.", "brand": "OZEMPIC", "market": "US"},
+                    {"message": "For Germany, always use 'gut verträglich' when describing HUMIRA tolerability — it is the approved term.", "instruction": "Step 3: Store a Germany-specific brand rule. Brand switches to HUMIRA / DE.", "brand": "HUMIRA", "market": "DE"},
+                    {"message": "What are the approved terminology rules for HUMIRA in Germany?", "instruction": "Step 4: Retrieve Germany-specific memory. Different from US rules — market isolation in action.", "brand": "HUMIRA", "market": "DE"},
                 ],
             },
             {
