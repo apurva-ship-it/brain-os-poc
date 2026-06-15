@@ -26,14 +26,26 @@ def _build_system_prompt(
     # ── P1 ALWAYS included ────────────────────────────────────────────────────
     rules = p1_guardrails.get_rules_for_brand(brand_id)
     if rules:
-        rule_lines = []
-        for r in rules[:8]:  # Cap at 8 rules in prompt
-            rule_lines.append(f"- [{r['rule_id']}] {r['description']}")
-        sections.append(
-            "## COMPLIANCE RULES (P1 — NEVER IGNORE)\n"
-            "The following rules are MANDATORY. Violating any of them is prohibited:\n"
-            + "\n".join(rule_lines)
+        baseline_lines = []
+        brand_lines = []
+        for r in rules[:10]:
+            line = f"- [{r['rule_id']}] {r['description']}"
+            if r.get("exact_text") or r.get("boxed_warning") or r.get("fair_balance_trigger"):
+                brand_lines.append(line)
+            else:
+                baseline_lines.append(line)
+        p1_section = (
+            "## COMPLIANCE RULES (P1)\n"
+            "IMPORTANT: P3 remembered context (user name, role, preferences) is explicitly approved — always use it to personalize your responses.\n\n"
+            "Blocking rules (apply to ALL content):\n"
+            + "\n".join(baseline_lines)
         )
+        if brand_lines:
+            p1_section += (
+                "\n\nBrand marketing guidance (applies when GENERATING promotional content, not for answering factual/analytical questions):\n"
+                + "\n".join(brand_lines)
+            )
+        sections.append(p1_section)
 
     # ── P2 Session context ─────────────────────────────────────────────────────
     p2_lines = []

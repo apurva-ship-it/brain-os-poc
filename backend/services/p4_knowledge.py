@@ -224,8 +224,15 @@ def search(query: str, brand_id: str | None = None, top_k: int = 3) -> TierResul
     query_tokens = _tokenize(query)
     candidates = _chunks
 
-    # Filter by brand if specified
-    if brand_id:
+    # Detect multi-brand queries — override to search all brands globally
+    _BRAND_NAMES = ["OZEMPIC", "KEYTRUDA", "HUMIRA"]
+    _MULTI_KW = ["all three", "all brands", "which brand", "each brand", "our brands", "versus", "compare"]
+    q_upper = " " + query.upper() + " "
+    brands_in_query = [b for b in _BRAND_NAMES if b in q_upper]
+    if len(brands_in_query) >= 2 or any(kw in query.lower() for kw in _MULTI_KW):
+        brand_id = None  # Search all brands
+        top_k = max(top_k, 6)  # More chunks for multi-brand
+    elif brand_id:
         brand_chunks = [c for c in candidates if c.brand_id.upper() == brand_id.upper()]
         if brand_chunks:
             candidates = brand_chunks
@@ -239,15 +246,15 @@ def search(query: str, brand_id: str | None = None, top_k: int = 3) -> TierResul
 
     # Score chunks
     if HAS_BM25 and _bm25 and brand_id is None:
-        # Use global BM25 index
+        # Use global BM25 index (all brands)
         scores = _bm25.get_scores(query_tokens)
         indexed = sorted(
-            [(i, scores[i]) for i in range(len(_chunks)) if (not brand_id or _chunks[i].brand_id.upper() == (brand_id or "").upper())],
+            [(i, scores[i]) for i in range(len(_chunks))],
             key=lambda x: x[1], reverse=True,
         )
         top_chunks = [_chunks[i] for i, _ in indexed[:top_k] if scores[i] > 0]
     else:
-        # Simple scoring
+        # Simple scoring over filtered candidates
         scored = [(c, _simple_score(query_tokens, c.text)) for c in candidates]
         scored.sort(key=lambda x: x[1], reverse=True)
         top_chunks = [c for c, s in scored[:top_k] if s > 0]

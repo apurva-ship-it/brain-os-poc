@@ -26,17 +26,17 @@ BASELINE_RULES = [
         "rule_id": "BASE-002",
         "name": "No Superlative Claims",
         "description": "Best-in-class, only, safest claims require specific regulatory approval",
-        "patterns": [r"\bbest in class\b", r"\bsafest\b", r"\bonly treatment\b", r"\bonly approved therapy\b"],
-        "severity": "high",
-        "message": "Superlative claims ('best', 'safest', 'only') require specific clinical evidence and regulatory approval.",
+        "patterns": [r"\bbest in class\b", r"\bsafest\b", r"\bonly treatment\b", r"\bonly approved therapy\b", r"\bmost effective\b", r"\bnumber one\b", r"\b#1\b"],
+        "severity": "critical",
+        "message": "Superlative claims ('best', 'safest', 'only treatment', 'most effective') require specific clinical evidence and regulatory approval.",
     },
     {
         "rule_id": "BASE-003",
         "name": "PII Detection",
-        "description": "No personally identifiable information in outputs",
+        "description": "Do not emit patient SSNs, DOBs, or medical record IDs. User-provided name/role/org stored in P3 are approved — use freely to personalize responses.",
         "patterns": [r"\b\d{3}-\d{2}-\d{4}\b", r"\bSSN\b", r"\bDOB:\s*\d"],
         "severity": "critical",
-        "message": "PII detected — redacted for compliance.",
+        "message": "Patient PII detected (SSN/DOB pattern) — redacted for compliance.",
     },
 ]
 
@@ -123,24 +123,25 @@ def check(message: str, response: str, brand_id: str | None) -> GuardrailResult:
                 "matched_text": message[:100],
             })
 
-    # Check brand-specific rules
+    # Brand-specific prohibited_claims: only block if GENERATING content (has response text).
+    # Pre-LLM checks (response="") use the system prompt to guide the LLM — never block queries.
     brand_key = (brand_id or "").upper()
-    for rule in BRAND_RULES.get(brand_key, []):
-        rules_checked += 1
-        exact = rule.get("exact_text", "").lower()
-        # Check if message asks to make a prohibited claim
-        if exact and (exact[:40] in combined or "don't" not in combined):
-            # Simple heuristic: if user asks about something that matches prohibited text
-            if any(word in combined for word in exact.split()[:4]):
-                # Don't flag every match — only flag if it's an affirmative request
-                if any(kw in message.lower() for kw in ["say", "write", "claim", "state", "tell", "use"]):
-                    violations.append({
-                        "rule_id": rule["rule_id"],
-                        "name": rule["name"],
-                        "severity": rule["severity"],
-                        "message": rule["message"],
-                        "matched_text": message[:100],
-                    })
+    if response:  # post-LLM check only
+        for rule in BRAND_RULES.get(brand_key, []):
+            rules_checked += 1
+            exact = rule.get("exact_text", "").lower()
+            # Only fire if the LLM response literally reproduces a prohibited claim
+            if exact and len(exact) > 10 and exact[:50] in response.lower():
+                violations.append({
+                    "rule_id": rule["rule_id"],
+                    "name": rule["name"],
+                    "severity": rule["severity"],
+                    "message": rule["message"],
+                    "matched_text": response[:100],
+                })
+    else:
+        # Pre-LLM: just count brand rules so the UI shows them
+        rules_checked += len(BRAND_RULES.get(brand_key, []))
 
     latency = (time.monotonic() - start) * 1000
     blocked = any(v["severity"] == "critical" for v in violations)
@@ -149,6 +150,15 @@ def check(message: str, response: str, brand_id: str | None) -> GuardrailResult:
     contributions = [
         {"type": "rules_loaded", "count": rules_checked, "brand": brand_key or "global"},
     ]
+    # Include rule summaries so the UI can show them on expand
+    for r in active_rules[:12]:
+        contributions.append({
+            "type": "rule_item",
+            "rule_id": r["rule_id"],
+            "name": r["name"],
+            "description": (r.get("description") or r.get("exact_text", ""))[:120],
+            "severity": r["severity"],
+        })
     if violations:
         for v in violations:
             contributions.append({"type": "violation", "rule": v["name"], "severity": v["severity"]})

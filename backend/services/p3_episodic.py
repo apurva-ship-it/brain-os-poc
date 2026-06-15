@@ -285,8 +285,8 @@ RULES:
 - If message is a question with no assertion, return {{"facts": []}}
 
 Categories:
-- user_fact: name, role, organization of the user
-- user_preference: tone, format, language preferences
+- user_fact: name, role, specialty, organization of the user (extract from "I am a X", "I'm a X", "My role is X")
+- user_preference: tone, format, language preferences (extract from "Give me X answers", "Always use X", "Answer in X format", "I prefer X")
 - mlr_feedback: MLR decisions — rejected/approved phrases (scope: brand_market if market known, else brand)
 - market_rule: market-specific rules for a brand (same scope rule)
 - brand_fact: factual claims about a specific drug/brand

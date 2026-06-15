@@ -28,3 +28,4 @@ backend/data/memory/
 
 # Vercel
 .vercel/
+.vercel

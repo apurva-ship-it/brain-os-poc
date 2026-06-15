@@ -239,6 +239,62 @@ async def demo_scenarios():
                     {"message": "What market am I working on, what's my name, and how should you format answers?", "instruction": "Step 4: Name known (P3 ✓). Market GONE (P2 ✗). Format preference GONE (P2 ✗)."},
                 ],
             },
+            {
+                "id": "p3-mlr-workflow",
+                "tier": "P3",
+                "title": "MLR Rejection Memory",
+                "description": "MLR rejects a phrase → Brain OS stores it in brand memory → future content automatically avoids it.",
+                "color": "purple",
+                "icon": "⚠️",
+                "steps": [
+                    {"message": "MLR just rejected 'rapidly effective' and 'fast-acting' for KEYTRUDA US — these phrases are now banned for promotional use.", "instruction": "Step 1: Report MLR decision. Both rejected phrases get stored in P3 brand memory for KEYTRUDA US.", "brand": "KEYTRUDA", "market": "US"},
+                    {"message": "What phrases are MLR-rejected for KEYTRUDA in the US?", "instruction": "Step 2: Query brand memory. P3 returns the exact rules you just stored.", "brand": "KEYTRUDA", "market": "US"},
+                    {"message": "Suggest 3 compliant alternatives to describe KEYTRUDA's speed of response in MSI-H tumors.", "instruction": "Step 3: Ask for compliant copy. Brain OS avoids the banned phrases and suggests approved language.", "brand": "KEYTRUDA", "market": "US"},
+                    {"message": "What are the approved phrases I can use instead of 'rapidly effective' for KEYTRUDA?", "instruction": "Step 4: Explicitly ask for guidance. P3 brand memory + P4 knowledge work together to give compliant alternatives.", "brand": "KEYTRUDA", "market": "US"},
+                ],
+            },
+            {
+                "id": "p2-brand-switching",
+                "tier": "P2",
+                "title": "Brand Context Switching",
+                "description": "Switch brands mid-session. P2 updates immediately — no manual dropdown needed.",
+                "color": "blue",
+                "icon": "🔀",
+                "steps": [
+                    {"message": "I'm starting work on OZEMPIC for the US market today. Focus on cardiovascular outcomes messaging.", "instruction": "Step 1: Set session context. P2 captures OZEMPIC / US from your message — no dropdown needed."},
+                    {"message": "What brand and market are we working on?", "instruction": "Step 2: Confirm P2 session context — should return OZEMPIC / US."},
+                    {"message": "Actually switching to HUMIRA for Germany now. We're working on the rheumatoid arthritis indication.", "instruction": "Step 3: Switch brands in plain language. P2 and P3 both update context to HUMIRA / DE."},
+                    {"message": "What brand, market, and indication are we currently working on?", "instruction": "Step 4: Confirm context switched. Should now return HUMIRA / Germany / RA — not OZEMPIC."},
+                ],
+            },
+            {
+                "id": "p1-p4-compliance-check",
+                "tier": "P1",
+                "title": "Compliance Checkpoint",
+                "description": "Test which claims are allowed vs blocked. P1 + P4 work together to guide compliant messaging.",
+                "color": "red",
+                "icon": "✅",
+                "steps": [
+                    {"message": "Can I claim that OZEMPIC reduces the risk of cardiovascular events in Type 2 diabetes patients?", "instruction": "Step 1: Evidence-based claim query. P4 retrieves LEADER trial data — claim is factually supportable."},
+                    {"message": "Write that OZEMPIC is the safest and most effective GLP-1 drug on the market.", "instruction": "Step 2: Superlative claim. P1 blocks 'safest' — superlative claims require specific regulatory basis."},
+                    {"message": "What approved efficacy claims can I make for OZEMPIC in cardiovascular risk reduction?", "instruction": "Step 3: Ask for what IS allowed. P4 retrieves approved claims, P1 compliance rules guide the response."},
+                    {"message": "Draft one compliant sentence about OZEMPIC's cardiovascular benefit for a physician brief.", "instruction": "Step 4: Compliant content generation. Brain OS uses P4 evidence + P1 rules to draft an approved claim."},
+                ],
+            },
+            {
+                "id": "p3-audience-personalization",
+                "tier": "P3",
+                "title": "Audience-Adaptive Content",
+                "description": "Set your professional role once — Brain OS adjusts its communication style for every future query, even in new sessions.",
+                "color": "purple",
+                "icon": "🎯",
+                "steps": [
+                    {"message": "I am a medical writer producing patient education materials. Always use simple, jargon-free language and analogies when explaining science.", "instruction": "Step 1: Set your professional role and style preference. Goes into P3 user memory permanently."},
+                    {"message": "How does KEYTRUDA work against cancer?", "instruction": "Step 2: Technical question — notice the simplified, patient-friendly explanation style P3 applies."},
+                    {"message": "CREATE_NEW_SESSION", "instruction": "Step 3: Start a new session. P2 session context is cleared."},
+                    {"message": "Explain how HUMIRA helps with rheumatoid arthritis.", "instruction": "Step 4: New session, different drug — but P3 still knows you're a medical writer who needs simple language."},
+                ],
+            },
         ]
     }
 
